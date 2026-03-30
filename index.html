@@ -2085,6 +2085,2240 @@
     }, 1500);
   }
 
+  // ---- REGISTRY (Supabase) ----
+  const SB_URL = 'https://jmatpwiipqwwgvusirtt.supabase.co';
+  const SB_KEY = 'sb_publishable_-6uh2nFv9DwIRss_yce7PA_MbSHCR7n';
+
+  let regAdminMode = false;
+  let regState = { open: false, topic: '' };
+
+  async function sbFetch(path, options = {}) {
+    const res = await fetch(SB_URL + path, {
+      ...options,
+      headers: {
+        'apikey': SB_KEY,
+        'Authorization': 'Bearer ' + SB_KEY,
+        'Content-Type': 'application/json',
+        'Prefer': options.prefer || '',
+        ...(options.headers || {})
+      }
+    });
+    if (!res.ok && res.status !== 204) {
+      const err = await res.text();
+      console.error('Supabase error:', err);
+      return null;
+    }
+    if (res.status === 204) return null;
+    return res.json();
+  }
+
+  async function loadRegState() {
+    const data = await sbFetch('/rest/v1/registry_state?id=eq.1&select=open,topic');
+    if (data && data.length > 0) {
+      regState = { open: data[0].open, topic: data[0].topic || '' };
+    }
+    applyRegState();
+  }
+
+  function applyRegState() {
+    const dot = document.getElementById('regDot');
+    const txt = document.getElementById('regStatusText');
+    const form = document.getElementById('regForm');
+    const banner = document.getElementById('regClosedBanner');
+    const topicDisplay = document.getElementById('regTopicDisplay');
+
+    if (regState.open) {
+      dot.className = 'reg-status-dot open';
+      txt.className = 'reg-status-text open';
+      txt.textContent = 'Registration Open';
+      form.classList.add('show');
+      banner.classList.remove('show');
+      topicDisplay.textContent = regState.topic || 'Topic to be announced.';
+    } else {
+      dot.className = 'reg-status-dot closed';
+      txt.className = 'reg-status-text closed';
+      txt.textContent = 'Registration Closed';
+      form.classList.remove('show');
+      banner.classList.add('show');
+    }
+
+    if (regAdminMode) loadAndRenderRegistrants();
+  }
+
+  function toggleRegPassword() {
+    const row = document.getElementById('regPasswordRow');
+    const btn = document.getElementById('regUnlockBtn');
+    if (regAdminMode) { exitRegAdmin(); return; }
+    row.classList.toggle('visible');
+    btn.classList.toggle('active');
+    if (row.classList.contains('visible')) document.getElementById('regPasswordInput').focus();
+  }
+
+  function submitRegPassword() {
+    const val = document.getElementById('regPasswordInput').value;
+    const err = document.getElementById('regPwError');
+    if (val === PASSWORD) {
+      err.textContent = '';
+      document.getElementById('regPasswordRow').classList.remove('visible');
+      document.getElementById('regPasswordInput').value = '';
+      enterRegAdmin();
+    } else {
+      err.textContent = 'Wrong password.';
+      document.getElementById('regPasswordInput').value = '';
+    }
+  }
+
+  function enterRegAdmin() {
+    regAdminMode = true;
+    document.getElementById('regUnlockBtn').textContent = '✕ Exit Admin';
+    document.getElementById('regUnlockBtn').classList.add('active');
+    document.getElementById('regAdminPanel').classList.add('show');
+    document.getElementById('regListPanel').classList.add('show');
+    document.getElementById('regTopicInput').value = regState.topic || '';
+    loadAndRenderRegistrants();
+  }
+
+  function exitRegAdmin() {
+    regAdminMode = false;
+    document.getElementById('regUnlockBtn').textContent = '⚙ Admin Panel';
+    document.getElementById('regUnlockBtn').classList.remove('active');
+    document.getElementById('regAdminPanel').classList.remove('show');
+    document.getElementById('regListPanel').classList.remove('show');
+  }
+
+  async function openRegistration() {
+    const topic = document.getElementById('regTopicInput').value.trim();
+    await sbFetch('/rest/v1/registry_state?id=eq.1', {
+      method: 'PATCH',
+      prefer: 'return=minimal',
+      body: JSON.stringify({ open: true, topic })
+    });
+    regState = { open: true, topic };
+    applyRegState();
+  }
+
+  async function closeRegistration() {
+    await sbFetch('/rest/v1/registry_state?id=eq.1', {
+      method: 'PATCH',
+      prefer: 'return=minimal',
+      body: JSON.stringify({ open: false })
+    });
+    regState.open = false;
+    applyRegState();
+  }
+
+  async function clearRegistrants() {
+    if (!confirm('Clear all registrants for this week?')) return;
+    await sbFetch('/rest/v1/registrants?id=gt.0', { method: 'DELETE' });
+    loadAndRenderRegistrants();
+  }
+
+  async function submitRegistration() {
+    const name = document.getElementById('regName').value.trim();
+    const phone = document.getElementById('regPhone').value.trim();
+    const success = document.getElementById('regSuccess');
+    if (!name || !phone) { alert('Please fill in both fields.'); return; }
+
+    // Check duplicate
+    const existing = await sbFetch('/rest/v1/registrants?phone=eq.' + encodeURIComponent(phone) + '&select=id');
+    if (existing && existing.length > 0) { alert('This number is already registered for this week.'); return; }
+
+    await sbFetch('/rest/v1/registrants', {
+      method: 'POST',
+      prefer: 'return=minimal',
+      body: JSON.stringify({ name, phone })
+    });
+
+    document.getElementById('regName').value = '';
+    document.getElementById('regPhone').value = '';
+    success.classList.add('show');
+    setTimeout(() => success.classList.remove('show'), 4000);
+  }
+
+  async function loadAndRenderRegistrants() {
+    const list = document.getElementById('regList');
+    const badge = document.getElementById('regCountBadge');
+    list.innerHTML = '<div style="padding:1rem;color:var(--muted);font-size:0.85rem;">Loading...</div>';
+
+    const items = await sbFetch('/rest/v1/registrants?select=name,phone&order=id.asc');
+    badge.textContent = items ? items.length : 0;
+    list.innerHTML = '';
+
+    if (!items || items.length === 0) {
+      list.innerHTML = '<div style="padding:1rem;color:var(--muted);font-style:italic;font-size:0.85rem;">No registrations yet.</div>';
+      return;
+    }
+
+    items.forEach((r, i) => {
+      const el = document.createElement('div');
+      el.className = 'reg-entry';
+      el.innerHTML = `
+        <div style="display:flex;align-items:center;">
+          <span class="reg-entry-idx">${i + 1}</span>
+          <span class="reg-entry-name">${r.name}</span>
+        </div>
+        <span class="reg-entry-num">${r.phone}</span>
+      `;
+      list.appendChild(el);
+    });
+  }
+
+  // Boot
+  loadRegState();
+</script>
+</body>
+</html>
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--black); }
+  ::-webkit-scrollbar-thumb { background: var(--flame-orange); }
+
+  /* NOISE OVERLAY */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.4;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.2rem 3rem;
+    background: rgba(8, 12, 26, 0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .nav-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2rem;
+    letter-spacing: 0.15em;
+    background: linear-gradient(135deg, var(--flame-orange), var(--flame-core));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-decoration: none;
+  }
+
+  .nav-logo span {
+    font-size: 0.6rem;
+    font-family: 'Rajdhani', sans-serif;
+    letter-spacing: 0.3em;
+    display: block;
+    -webkit-text-fill-color: var(--muted);
+    margin-top: -4px;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 2.5rem;
+    list-style: none;
+  }
+
+  .nav-links a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    transition: color 0.3s;
+    position: relative;
+  }
+
+  .nav-links a::after {
+    content: '';
+    position: absolute;
+    bottom: -4px; left: 0;
+    width: 0; height: 1px;
+    background: var(--flame-orange);
+    transition: width 0.3s;
+  }
+
+  .nav-links a:hover { color: var(--flame-bright); }
+  .nav-links a:hover::after { width: 100%; }
+
+  .nav-cta {
+    padding: 0.5rem 1.5rem;
+    border: 1px solid var(--flame-orange);
+    color: var(--flame-orange) !important;
+    border-radius: 2px;
+    transition: background 0.3s, color 0.3s !important;
+  }
+
+  .nav-cta:hover {
+    background: var(--flame-orange) !important;
+    color: var(--black) !important;
+    -webkit-text-fill-color: var(--black) !important;
+  }
+
+  /* HERO */
+  #hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    padding: 0 2rem;
+  }
+
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 80% at 50% 100%, rgba(255,107,0,0.18) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 40% at 20% 60%, rgba(255,154,0,0.08) 0%, transparent 60%),
+      radial-gradient(ellipse 30% 30% at 80% 40%, rgba(255,208,0,0.06) 0%, transparent 60%),
+      var(--deep-navy);
+  }
+
+  /* Animated flame particles */
+  .flames {
+    position: absolute;
+    bottom: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 600px;
+    height: 300px;
+    pointer-events: none;
+  }
+
+  .flame-particle {
+    position: absolute;
+    bottom: 0;
+    border-radius: 50% 50% 20% 20%;
+    animation: flameRise linear infinite;
+    opacity: 0;
+  }
+
+  @keyframes flameRise {
+    0% { transform: translateY(0) scaleX(1); opacity: 0.8; }
+    50% { transform: translateY(-60%) scaleX(0.8); opacity: 0.5; }
+    100% { transform: translateY(-120%) scaleX(0.4); opacity: 0; }
+  }
+
+  .hero-eyebrow {
+    font-size: 0.75rem;
+    letter-spacing: 0.5em;
+    text-transform: uppercase;
+    color: var(--flame-orange);
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.3s forwards;
+  }
+
+  .hero-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(5rem, 15vw, 11rem);
+    line-height: 0.9;
+    letter-spacing: 0.08em;
+    position: relative;
+    z-index: 2;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.5s forwards;
+  }
+
+  .hero-title .line1 {
+    display: block;
+    background: linear-gradient(180deg, var(--white) 0%, var(--text) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .hero-title .line2 {
+    display: block;
+    background: linear-gradient(135deg, var(--flame-orange) 0%, var(--flame-core) 50%, var(--flame-bright) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: none;
+    filter: drop-shadow(0 0 40px rgba(255,107,0,0.5));
+  }
+
+  .hero-sub {
+    font-family: 'Crimson Pro', serif;
+    font-size: 1.3rem;
+    font-style: italic;
+    color: var(--muted);
+    max-width: 520px;
+    line-height: 1.7;
+    margin: 1.5rem auto 2.5rem;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.7s forwards;
+  }
+
+  .hero-sub strong {
+    color: var(--flame-bright);
+    font-style: normal;
+  }
+
+  .hero-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.9s forwards;
+  }
+
+  .btn-primary {
+    padding: 0.85rem 2.5rem;
+    background: linear-gradient(135deg, var(--flame-orange), var(--flame-bright));
+    color: var(--black);
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.85rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    text-decoration: none;
+    border: none;
+    clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+    cursor: pointer;
+    transition: filter 0.3s, transform 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-primary::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, var(--flame-core), var(--flame-orange));
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .btn-primary:hover { filter: brightness(1.2); transform: translateY(-2px); }
+  .btn-primary:hover::before { opacity: 1; }
+
+  .btn-secondary {
+    padding: 0.85rem 2.5rem;
+    border: 1px solid rgba(255,107,0,0.4);
+    color: var(--text);
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 600;
+    font-size: 0.85rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    text-decoration: none;
+    background: transparent;
+    clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+    cursor: pointer;
+    transition: border-color 0.3s, background 0.3s;
+  }
+
+  .btn-secondary:hover {
+    border-color: var(--flame-orange);
+    background: rgba(255,107,0,0.08);
+  }
+
+  .hero-scroll {
+    position: absolute;
+    bottom: 2.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    opacity: 0;
+    animation: fadeUp 0.8s 1.2s forwards;
+  }
+
+  .scroll-line {
+    width: 1px;
+    height: 40px;
+    background: linear-gradient(to bottom, var(--flame-orange), transparent);
+    animation: scrollPulse 1.8s ease-in-out infinite;
+  }
+
+  @keyframes scrollPulse {
+    0%, 100% { transform: scaleY(1); opacity: 1; }
+    50% { transform: scaleY(0.6); opacity: 0.4; }
+  }
+
+  .scroll-text {
+    font-size: 0.65rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* SECTION BASE */
+  section { padding: 7rem 3rem; }
+
+  .section-label {
+    font-size: 0.7rem;
+    letter-spacing: 0.5em;
+    text-transform: uppercase;
+    color: var(--flame-orange);
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .section-label::before {
+    content: '';
+    width: 30px;
+    height: 1px;
+    background: var(--flame-orange);
+    flex-shrink: 0;
+  }
+
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    letter-spacing: 0.05em;
+    line-height: 1;
+    color: var(--white);
+    margin-bottom: 1rem;
+  }
+
+  .section-desc {
+    font-family: 'Crimson Pro', serif;
+    font-size: 1.1rem;
+    color: var(--muted);
+    max-width: 500px;
+    line-height: 1.7;
+  }
+
+  /* DIVIDER */
+  .flame-divider {
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--flame-orange), transparent);
+    margin: 0;
+    opacity: 0.3;
+  }
+
+  /* ABOUT */
+  #about {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5rem;
+    align-items: center;
+  }
+
+  .about-visual {
+    position: relative;
+  }
+
+  .about-badge {
+    width: 100%;
+    aspect-ratio: 1;
+    max-width: 400px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  .badge-ring {
+    position: absolute;
+    border-radius: 50%;
+    border: 1px solid rgba(255,107,0,0.2);
+    animation: ringPulse 3s ease-in-out infinite;
+  }
+
+  .badge-ring:nth-child(1) { width: 90%; height: 90%; animation-delay: 0s; }
+  .badge-ring:nth-child(2) { width: 72%; height: 72%; animation-delay: 0.5s; border-style: dashed; }
+  .badge-ring:nth-child(3) { width: 54%; height: 54%; animation-delay: 1s; }
+
+  @keyframes ringPulse {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 0.7; transform: scale(1.02); }
+  }
+
+  .badge-center {
+    width: 160px;
+    height: 160px;
+    background: radial-gradient(circle, rgba(255,154,0,0.15), rgba(255,107,0,0.08));
+    border: 1px solid rgba(255,107,0,0.4);
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+    position: relative;
+    z-index: 2;
+  }
+
+  .badge-icon {
+    font-size: 3rem;
+  }
+
+  .badge-text {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 0.85rem;
+    letter-spacing: 0.3em;
+    color: var(--flame-bright);
+  }
+
+  .about-content { }
+
+  .about-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-top: 2.5rem;
+    padding-top: 2.5rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .stat-item { }
+
+  .stat-number {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.5rem;
+    background: linear-gradient(135deg, var(--flame-orange), var(--flame-core));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 0.25rem;
+  }
+
+  /* EVENTS */
+  #events {
+    background: linear-gradient(180deg, var(--deep-navy), var(--dark-surface), var(--deep-navy));
+  }
+
+  .events-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .events-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 3rem;
+  }
+
+  .events-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .event-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    padding: 1.75rem;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.3s, transform 0.3s;
+    clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px));
+  }
+
+  .event-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px;
+    height: 0;
+    background: linear-gradient(to bottom, var(--flame-orange), var(--flame-core));
+    transition: height 0.4s;
+  }
+
+  .event-card:hover { border-color: rgba(255,107,0,0.5); transform: translateY(-4px); }
+  .event-card:hover::before { height: 100%; }
+
+  .event-type {
+    font-size: 0.65rem;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    font-weight: 700;
+    padding: 0.3rem 0.75rem;
+    border-radius: 2px;
+    display: inline-block;
+    margin-bottom: 1rem;
+  }
+
+  .type-fiction { background: rgba(255,107,0,0.15); color: var(--flame-orange); }
+  .type-nonfiction { background: rgba(255,208,0,0.1); color: var(--flame-core); }
+  .type-open { background: rgba(255,154,0,0.1); color: var(--flame-bright); }
+
+  .event-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.5rem;
+    letter-spacing: 0.06em;
+    color: var(--white);
+    margin-bottom: 0.75rem;
+    line-height: 1.1;
+  }
+
+  .event-desc {
+    font-family: 'Crimson Pro', serif;
+    font-size: 0.95rem;
+    color: var(--muted);
+    line-height: 1.6;
+    margin-bottom: 1.25rem;
+  }
+
+  .event-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255,255,255,0.05);
+  }
+
+  .event-date {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .event-slots {
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    color: var(--flame-orange);
+    font-weight: 600;
+  }
+
+  /* MEMBERS */
+  #members {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .members-header {
+    margin-bottom: 3.5rem;
+  }
+
+  .members-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1.25rem;
+  }
+
+  .member-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    padding: 2rem 1.5rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.3s, transform 0.3s;
+  }
+
+  .member-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 0%, rgba(255,107,0,0.08), transparent 70%);
+    opacity: 0;
+    transition: opacity 0.4s;
+  }
+
+  .member-card:hover { border-color: rgba(255,107,0,0.5); transform: translateY(-4px); }
+  .member-card:hover::after { opacity: 1; }
+
+  .member-avatar {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    margin: 0 auto 1rem;
+    background: linear-gradient(135deg, var(--flame-orange), var(--deep-navy));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.8rem;
+    color: var(--white);
+    border: 2px solid rgba(255,107,0,0.3);
+    position: relative;
+    z-index: 1;
+  }
+
+  .member-role {
+    font-size: 0.65rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--flame-orange);
+    font-weight: 700;
+    margin-bottom: 0.4rem;
+  }
+
+  .member-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.2rem;
+    letter-spacing: 0.08em;
+    color: var(--white);
+    margin-bottom: 0.5rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .member-specialty {
+    font-family: 'Crimson Pro', serif;
+    font-size: 0.85rem;
+    font-style: italic;
+    color: var(--muted);
+    position: relative;
+    z-index: 1;
+  }
+
+  .member-flame {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    background: var(--flame-orange);
+    border-radius: 50%;
+    margin: 0.75rem auto 0;
+    box-shadow: 0 0 8px var(--flame-orange);
+    position: relative;
+    z-index: 1;
+  }
+
+  /* RESOURCES */
+  #resources {
+    background: linear-gradient(180deg, var(--deep-navy), var(--dark-surface));
+  }
+
+  .resources-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .resources-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 3rem;
+  }
+
+  .resources-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 1.5rem;
+  }
+
+  .resource-featured {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    padding: 2.5rem;
+    position: relative;
+    overflow: hidden;
+    clip-path: polygon(0 0, calc(100% - 24px) 0, 100% 24px, 100% 100%, 24px 100%, 0 calc(100% - 24px));
+    transition: border-color 0.3s;
+  }
+
+  .resource-featured:hover { border-color: rgba(255,107,0,0.5); }
+
+  .resource-featured-bg {
+    position: absolute;
+    top: -50px; right: -50px;
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, rgba(255,107,0,0.08), transparent 70%);
+    pointer-events: none;
+  }
+
+  .resource-tag {
+    font-size: 0.65rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--flame-orange);
+    margin-bottom: 1rem;
+  }
+
+  .resource-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2rem;
+    letter-spacing: 0.05em;
+    color: var(--white);
+    margin-bottom: 1rem;
+    line-height: 1.1;
+  }
+
+  .resource-excerpt {
+    font-family: 'Crimson Pro', serif;
+    font-size: 1rem;
+    color: var(--muted);
+    line-height: 1.7;
+    margin-bottom: 1.5rem;
+  }
+
+  .resource-link {
+    font-size: 0.75rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--flame-orange);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: gap 0.3s;
+  }
+
+  .resource-link::after { content: '→'; }
+  .resource-link:hover { gap: 1rem; }
+
+  .resources-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .resource-item {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    transition: border-color 0.3s, background 0.3s;
+    cursor: pointer;
+  }
+
+  .resource-item:hover {
+    border-color: rgba(255,107,0,0.5);
+    background: rgba(255,107,0,0.03);
+  }
+
+  .resource-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.4rem;
+    color: rgba(255,107,0,0.3);
+    line-height: 1;
+    flex-shrink: 0;
+  }
+
+  .resource-item-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 0.25rem;
+  }
+
+  .resource-item-meta {
+    font-size: 0.7rem;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+  }
+
+  /* JOIN CTA */
+  #join {
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .join-bg {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 80% 80% at 50% 50%, rgba(255,107,0,0.12) 0%, transparent 70%);
+  }
+
+  .join-inner {
+    position: relative;
+    z-index: 2;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  .join-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(3rem, 8vw, 6rem);
+    letter-spacing: 0.08em;
+    line-height: 1;
+    background: linear-gradient(135deg, var(--white), var(--flame-bright));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 1rem;
+  }
+
+  .join-sub {
+    font-family: 'Crimson Pro', serif;
+    font-size: 1.2rem;
+    font-style: italic;
+    color: var(--muted);
+    margin-bottom: 2.5rem;
+    line-height: 1.7;
+  }
+
+  /* FOOTER */
+  footer {
+    background: var(--black);
+    padding: 2.5rem 3rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid var(--border);
+  }
+
+  .footer-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.5rem;
+    letter-spacing: 0.15em;
+    background: linear-gradient(135deg, var(--flame-orange), var(--flame-core));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .footer-text {
+    font-size: 0.75rem;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+  }
+
+  .footer-links {
+    display: flex;
+    gap: 2rem;
+    list-style: none;
+  }
+
+  .footer-links a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    transition: color 0.3s;
+  }
+
+  .footer-links a:hover { color: var(--flame-orange); }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.7s, transform 0.7s;
+  }
+
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* LEADERBOARD */
+  #leaderboard {
+    background: linear-gradient(180deg, var(--dark-surface), var(--deep-navy));
+  }
+
+  .leaderboard-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .leaderboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 3rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .lb-unlock-btn {
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--muted);
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 0.5rem 1.25rem;
+    cursor: pointer;
+    transition: border-color 0.3s, color 0.3s;
+    font-family: 'Rajdhani', sans-serif;
+  }
+
+  .lb-unlock-btn:hover { border-color: var(--flame-orange); color: var(--flame-orange); }
+  .lb-unlock-btn.active { border-color: var(--flame-orange); color: var(--flame-orange); background: rgba(255,107,0,0.08); }
+
+  .lb-password-row {
+    display: none;
+    gap: 0.75rem;
+    align-items: center;
+    margin-bottom: 2rem;
+  }
+
+  .lb-password-row.visible { display: flex; }
+
+  .lb-password-input {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.9rem;
+    padding: 0.5rem 1rem;
+    outline: none;
+    letter-spacing: 0.1em;
+    transition: border-color 0.3s;
+    width: 200px;
+  }
+
+  .lb-password-input:focus { border-color: var(--flame-orange); }
+
+  .lb-password-submit {
+    padding: 0.5rem 1.25rem;
+    background: var(--flame-orange);
+    color: var(--black);
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.8rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    border: none;
+    cursor: pointer;
+    transition: filter 0.3s;
+  }
+
+  .lb-password-submit:hover { filter: brightness(1.15); }
+
+  .lb-error { font-size: 0.75rem; color: #ff4444; letter-spacing: 0.1em; }
+
+  .leaderboard-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+  }
+
+  .lb-board {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    overflow: hidden;
+  }
+
+  .lb-board-header {
+    padding: 1.25rem 1.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .lb-board-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.4rem;
+    letter-spacing: 0.1em;
+  }
+
+  .lb-board-title.fame { color: var(--flame-core); }
+  .lb-board-title.shame { color: #888; }
+
+  .lb-board-icon { font-size: 1.4rem; }
+
+  .lb-add-btn {
+    display: none;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--flame-orange);
+    background: transparent;
+    border: 1px solid rgba(255,107,0,0.3);
+    padding: 0.3rem 0.75rem;
+    cursor: pointer;
+    font-family: 'Rajdhani', sans-serif;
+    transition: background 0.3s;
+  }
+
+  .lb-add-btn:hover { background: rgba(255,107,0,0.08); }
+  .lb-add-btn.show { display: flex; }
+
+  .lb-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .lb-table th {
+    font-size: 0.65rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 700;
+    padding: 0.75rem 1.75rem;
+    text-align: left;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+
+  .lb-table th:last-child { text-align: right; }
+
+  .lb-row {
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    transition: background 0.2s;
+  }
+
+  .lb-row:last-child { border-bottom: none; }
+  .lb-row:hover { background: rgba(255,107,0,0.03); }
+
+  .lb-rank {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.1rem;
+    color: rgba(255,107,0,0.35);
+    padding: 1rem 1.75rem;
+    width: 40px;
+  }
+
+  .lb-rank.top { color: var(--flame-core); }
+
+  .lb-name {
+    font-weight: 600;
+    font-size: 0.95rem;
+    letter-spacing: 0.05em;
+    padding: 1rem 0;
+  }
+
+  .lb-name-input {
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid rgba(255,107,0,0.4);
+    color: var(--text);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    outline: none;
+    width: 120px;
+    padding: 0.2rem 0;
+  }
+
+  .lb-score {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.2rem;
+    text-align: right;
+    padding: 1rem 1.75rem;
+  }
+
+  .lb-score.fame-score { color: var(--flame-core); }
+  .lb-score.shame-score { color: #666; }
+
+  .lb-score-input {
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid rgba(255,107,0,0.4);
+    color: inherit;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.2rem;
+    outline: none;
+    width: 50px;
+    text-align: right;
+    padding: 0.2rem 0;
+  }
+
+  .lb-delete-btn {
+    background: transparent;
+    border: none;
+    color: rgba(255,68,68,0.4);
+    cursor: pointer;
+    font-size: 0.9rem;
+    padding: 1rem 1.75rem 1rem 0;
+    display: none;
+    transition: color 0.2s;
+  }
+
+  .lb-delete-btn:hover { color: #ff4444; }
+  .lb-delete-btn.show { display: table-cell; }
+
+  .lb-empty {
+    text-align: center;
+    padding: 3rem 1.75rem;
+    font-family: 'Crimson Pro', serif;
+    font-style: italic;
+    color: var(--muted);
+    font-size: 0.95rem;
+  }
+
+  .lb-save-bar {
+    display: none;
+    justify-content: flex-end;
+    padding: 1.25rem 1.75rem;
+    border-top: 1px solid var(--border);
+    gap: 0.75rem;
+  }
+
+  .lb-save-bar.show { display: flex; }
+
+  .lb-save-btn {
+    padding: 0.5rem 1.5rem;
+    background: linear-gradient(135deg, var(--flame-orange), var(--flame-bright));
+    color: var(--black);
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.8rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    border: none;
+    cursor: pointer;
+    transition: filter 0.3s;
+  }
+
+  .lb-save-btn:hover { filter: brightness(1.15); }
+
+  /* RESPONSIVE */
+  @media (max-width: 768px) {
+    nav { padding: 1rem 1.5rem; }
+    .nav-links { display: none; }
+    section { padding: 5rem 1.5rem; }
+    #about { grid-template-columns: 1fr; gap: 3rem; }
+    .about-visual { order: -1; }
+    .resources-grid { grid-template-columns: 1fr; }
+    .events-header, .resources-header { flex-direction: column; gap: 1rem; align-items: flex-start; }
+    footer { flex-direction: column; gap: 1.5rem; text-align: center; }
+    .leaderboard-grid { grid-template-columns: 1fr; }
+  }
+  /* REGISTRY */
+  #registry {
+    background: var(--deep-navy);
+  }
+
+  .registry-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .registry-layout {
+    display: grid;
+    grid-template-columns: 1fr 1.4fr;
+    gap: 4rem;
+    align-items: start;
+  }
+
+  .registry-info { }
+
+  .registry-status-box {
+    margin-top: 2rem;
+    padding: 1.25rem 1.5rem;
+    border: 1px solid var(--border);
+    background: var(--card-bg);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .reg-status-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .reg-status-dot.open {
+    background: #22c55e;
+    box-shadow: 0 0 8px #22c55e;
+    animation: dotPulse 1.5s ease-in-out infinite;
+  }
+
+  .reg-status-dot.closed {
+    background: #555;
+  }
+
+  @keyframes dotPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  .reg-status-text {
+    font-size: 0.8rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    font-weight: 700;
+  }
+
+  .reg-status-text.open { color: #22c55e; }
+  .reg-status-text.closed { color: var(--muted); }
+
+  .reg-admin-panel {
+    margin-top: 1.5rem;
+    display: none;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .reg-admin-panel.show { display: flex; }
+
+  .reg-topic-input {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.95rem;
+    padding: 0.6rem 1rem;
+    outline: none;
+    width: 100%;
+    transition: border-color 0.3s;
+  }
+
+  .reg-topic-input:focus { border-color: var(--flame-orange); }
+
+  .reg-admin-buttons {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .reg-open-btn {
+    padding: 0.55rem 1.25rem;
+    background: linear-gradient(135deg, #16a34a, #22c55e);
+    color: #fff;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.8rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    border: none;
+    cursor: pointer;
+    transition: filter 0.3s;
+  }
+
+  .reg-open-btn:hover { filter: brightness(1.15); }
+
+  .reg-close-btn {
+    padding: 0.55rem 1.25rem;
+    background: transparent;
+    border: 1px solid #ef4444;
+    color: #ef4444;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.8rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+
+  .reg-close-btn:hover { background: rgba(239,68,68,0.1); }
+
+  .reg-clear-btn {
+    padding: 0.55rem 1.25rem;
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.1);
+    color: var(--muted);
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.8rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: border-color 0.3s, color 0.3s;
+  }
+
+  .reg-clear-btn:hover { border-color: var(--muted); color: var(--text); }
+
+  /* FORM SIDE */
+  .registry-form-area { }
+
+  .reg-closed-banner {
+    display: none;
+    background: var(--card-bg);
+    border: 1px solid rgba(255,255,255,0.08);
+    padding: 3rem 2rem;
+    text-align: center;
+  }
+
+  .reg-closed-banner.show { display: block; }
+
+  .reg-closed-icon { font-size: 2.5rem; margin-bottom: 1rem; }
+
+  .reg-closed-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.6rem;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    margin-bottom: 0.5rem;
+  }
+
+  .reg-closed-sub {
+    font-family: 'Crimson Pro', serif;
+    font-style: italic;
+    color: var(--muted);
+    font-size: 0.95rem;
+  }
+
+  .reg-form {
+    display: none;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .reg-form.show { display: flex; }
+
+  .reg-topic-display {
+    padding: 1rem 1.5rem;
+    background: rgba(255,107,0,0.08);
+    border-left: 3px solid var(--flame-orange);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.1rem;
+    letter-spacing: 0.08em;
+    color: var(--flame-bright);
+  }
+
+  .reg-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .reg-label {
+    font-size: 0.7rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--muted);
+  }
+
+  .reg-input {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1rem;
+    padding: 0.75rem 1rem;
+    outline: none;
+    transition: border-color 0.3s;
+    width: 100%;
+  }
+
+  .reg-input:focus { border-color: var(--flame-orange); }
+
+  .reg-submit {
+    padding: 0.85rem 2rem;
+    background: linear-gradient(135deg, var(--flame-orange), var(--flame-bright));
+    color: var(--black);
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    font-size: 0.9rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    border: none;
+    cursor: pointer;
+    clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+    transition: filter 0.3s;
+    align-self: flex-start;
+  }
+
+  .reg-submit:hover { filter: brightness(1.15); }
+
+  .reg-success {
+    display: none;
+    padding: 1rem 1.25rem;
+    background: rgba(34,197,94,0.08);
+    border: 1px solid rgba(34,197,94,0.3);
+    color: #22c55e;
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+  }
+
+  .reg-success.show { display: block; }
+
+  /* REGISTRANTS LIST */
+  .reg-list-panel {
+    display: none;
+    margin-top: 2.5rem;
+  }
+
+  .reg-list-panel.show { display: block; }
+
+  .reg-list-title {
+    font-size: 0.7rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--muted);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .reg-count-badge {
+    background: rgba(255,107,0,0.15);
+    color: var(--flame-orange);
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 0.2rem 0.5rem;
+    letter-spacing: 0.1em;
+  }
+
+  .reg-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    max-height: 300px;
+    overflow-y: auto;
+  }
+
+  .reg-list::-webkit-scrollbar { width: 3px; }
+  .reg-list::-webkit-scrollbar-thumb { background: var(--flame-orange); }
+
+  .reg-entry {
+    background: var(--card-bg);
+    border: 1px solid rgba(255,255,255,0.05);
+    padding: 0.75rem 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9rem;
+  }
+
+  .reg-entry-name { font-weight: 600; color: var(--text); }
+  .reg-entry-num { color: var(--muted); font-size: 0.8rem; letter-spacing: 0.05em; }
+  .reg-entry-idx {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1rem;
+    color: rgba(255,107,0,0.4);
+    margin-right: 0.75rem;
+  }
+
+  @media (max-width: 768px) {
+    .registry-layout { grid-template-columns: 1fr; gap: 2.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#hero" class="nav-logo">
+    REBORN!
+    <span>Debate Community</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#events">Events</a></li>
+    <li><a href="#registry">Weekly Debate</a></li>
+    <li><a href="#members">Members</a></li>
+    <li><a href="#resources">Resources</a></li>
+    <li><a href="#leaderboard">Leaderboard</a></li>
+    <li><a href="https://chat.whatsapp.com/JLBhXgOOdxgBIckM9CP8Vj" target="_blank" class="nav-cta">Join</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-bg"></div>
+
+  <div class="flames" aria-hidden="true">
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const flames = document.querySelector('.flames');
+        if (!flames) return;
+        const colors = ['#FF6B00','#FF9A00','#FFD000','#FF4500'];
+        for (let i = 0; i < 18; i++) {
+          const p = document.createElement('div');
+          p.className = 'flame-particle';
+          const size = 20 + Math.random() * 50;
+          p.style.cssText = `
+            width:${size}px;
+            height:${size * 1.4}px;
+            left:${10 + Math.random() * 80}%;
+            background:${colors[Math.floor(Math.random()*colors.length)]};
+            opacity:${0.3 + Math.random() * 0.5};
+            animation-duration:${1.5 + Math.random() * 2}s;
+            animation-delay:${Math.random() * 2}s;
+          `;
+          flames.appendChild(p);
+        }
+      });
+    </script>
+  </div>
+
+  <div class="hero-eyebrow">🔥 Where Words Combust</div>
+
+  <h1 class="hero-title">
+    <span class="line1">REBORN</span>
+    <span class="line2">DEBATE!</span>
+  </h1>
+
+  <p class="hero-sub">
+    A community for those who argue with <strong>precision</strong>, read with <strong>obsession</strong>, and debate with the conviction of someone who's already died twice.
+  </p>
+
+  <div class="hero-buttons">
+    <a href="#join" class="btn-primary">Join the Family</a>
+    <a href="#events" class="btn-secondary">View Events</a>
+  </div>
+
+  <div class="hero-scroll">
+    <span class="scroll-text">Scroll</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<div class="flame-divider"></div>
+
+<!-- ABOUT -->
+<section>
+  <div id="about">
+    <div class="about-visual reveal">
+      <div class="about-badge">
+        <div class="badge-ring"></div>
+        <div class="badge-ring"></div>
+        <div class="badge-ring"></div>
+        <div class="badge-center">
+          <span class="badge-icon">🔥</span>
+          <span class="badge-text">Reborn!</span>
+        </div>
+      </div>
+    </div>
+    <div class="about-content reveal">
+      <p class="section-label">About Us</p>
+      <h2 class="section-title">We Don't Just Read.<br>We Argue.</h2>
+      <p class="section-desc">
+        Reborn! is a debate community built for readers who take fiction and non-fiction seriously. From powerscaling fictional universes to dissecting political theory — we treat every argument like it matters.
+      </p>
+      <p class="section-desc" style="margin-top:1rem;">
+        Whether you're defending a character's strength ceiling or dismantling a philosopher's worldview, you belong here.
+      </p>
+      <div class="about-stats">
+        <div class="stat-item">
+          <div class="stat-number">200+</div>
+          <div class="stat-label">Active Members</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">48</div>
+          <div class="stat-label">Debates Held</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">12</div>
+          <div class="stat-label">Topics Monthly</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="flame-divider"></div>
+
+<!-- EVENTS -->
+<section id="events">
+  <div class="events-inner">
+    <div class="events-header reveal">
+      <div>
+        <p class="section-label">Schedule</p>
+        <h2 class="section-title">Upcoming Battles</h2>
+      </div>
+      <a href="#" class="resource-link">All Events</a>
+    </div>
+
+    <div class="events-grid" style="grid-template-columns: 1fr;">
+      <div class="event-card reveal" style="max-width: 500px;">
+        <span class="event-type type-open">Weekly Debate</span>
+        <h3 class="event-title">Weekly Debate Session</h3>
+        <p class="event-desc">Every week, members go head to head on a chosen topic — fiction or non-fiction. Register below to secure your spot for next week's session.</p>
+        <div class="event-meta">
+          <span class="event-date">Every Week</span>
+          <span class="event-slots">↓ Register Below</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="flame-divider"></div>
+
+<!-- MEMBERS -->
+<section>
+  <div id="members">
+    <div class="members-header reveal">
+      <p class="section-label">The Family</p>
+      <h2 class="section-title">Our Core Members</h2>
+      <p class="section-desc">Every strong argument needs a stronger opponent.</p>
+    </div>
+
+    <div class="members-grid">
+      <div class="member-card reveal">
+        <div class="member-avatar">T</div>
+        <p class="member-role">Founder</p>
+        <h3 class="member-name">The One</h3>
+        <p class="member-specialty">The Beginning & The End</p>
+        <div class="member-flame"></div>
+      </div>
+
+      <div class="member-card reveal">
+        <div class="member-avatar" style="background: linear-gradient(135deg, #FFD000, #0A0A0A);">M</div>
+        <p class="member-role">Moderator</p>
+        <h3 class="member-name">Mahmud</h3>
+        <p class="member-specialty">Order & Precision</p>
+        <div class="member-flame"></div>
+      </div>
+
+      <div class="member-card reveal">
+        <div class="member-avatar" style="background: linear-gradient(135deg, #FF4500, #141824);">J</div>
+        <p class="member-role">Moderator</p>
+        <h3 class="member-name">Just Cube</h3>
+        <p class="member-specialty">Structure & Balance</p>
+        <div class="member-flame"></div>
+      </div>
+
+      <div class="member-card reveal">
+        <div class="member-avatar" style="background: linear-gradient(135deg, #FF9A00, #080C1A);">N</div>
+        <p class="member-role">Senior Debater</p>
+        <h3 class="member-name">Narr Mu</h3>
+        <p class="member-specialty">Argument & Analysis</p>
+        <div class="member-flame"></div>
+      </div>
+
+      <div class="member-card reveal">
+        <div class="member-avatar" style="background: linear-gradient(135deg, #FF6B00, #10141F);">A</div>
+        <p class="member-role">Wildcard</p>
+        <h3 class="member-name">Attendant Of Mysteries</h3>
+        <p class="member-specialty">The Unpredictable</p>
+        <div class="member-flame"></div>
+      </div>
+
+
+    </div>
+  </div>
+</section>
+
+<div class="flame-divider"></div>
+
+<!-- RESOURCES -->
+<section id="resources">
+  <div class="resources-inner">
+    <div class="resources-header reveal">
+      <div>
+        <p class="section-label">Knowledge Base</p>
+        <h2 class="section-title">Resources & Articles</h2>
+      </div>
+      <a href="#" class="resource-link">Full Library</a>
+    </div>
+
+    <div class="resources-grid">
+      <div class="resource-featured reveal">
+        <div class="resource-featured-bg"></div>
+        <p class="resource-tag">📌 Featured · Non-Fiction</p>
+        <h3 class="resource-title">The Art of the Steel Man: How to Win Debates You're Losing</h3>
+        <p class="resource-excerpt">
+          Steelmanning — presenting your opponent's argument in its strongest possible form before dismantling it — is the most underused technique in competitive debate. We break down how it works, why it builds credibility, and why most people refuse to do it.
+        </p>
+        <a href="#" class="resource-link">Read Article</a>
+      </div>
+
+      <div class="resources-list">
+        <div class="resource-item reveal">
+          <span class="resource-num">01</span>
+          <div>
+            <p class="resource-item-title">Logical Fallacies: The Complete Field Guide</p>
+            <p class="resource-item-meta">Reference · 8 min read</p>
+          </div>
+        </div>
+        <div class="resource-item reveal">
+          <span class="resource-num">02</span>
+          <div>
+            <p class="resource-item-title">How to Powerscale a Fictional Universe Rigorously</p>
+            <p class="resource-item-meta">Fiction · 12 min read</p>
+          </div>
+        </div>
+        <div class="resource-item reveal">
+          <span class="resource-num">03</span>
+          <div>
+            <p class="resource-item-title">Introduction to Rhetorical Analysis</p>
+            <p class="resource-item-meta">Non-Fiction · 6 min read</p>
+          </div>
+        </div>
+        <div class="resource-item reveal">
+          <span class="resource-num">04</span>
+          <div>
+            <p class="resource-item-title">Rules of Engagement: Reborn! Debate Format</p>
+            <p class="resource-item-meta">Community · 4 min read</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="flame-divider"></div>
+
+<!-- REGISTRY -->
+<section id="registry">
+  <div class="registry-inner">
+    <div class="registry-header reveal" style="margin-bottom:3rem;">
+      <p class="section-label">Weekly Debate</p>
+      <h2 class="section-title">Register to Debate</h2>
+      <p class="section-desc">Sign up for next week's debate session. Registration opens and closes at the admin's discretion.</p>
+    </div>
+
+    <div class="registry-layout">
+
+      <!-- LEFT: STATUS + ADMIN -->
+      <div class="registry-info reveal">
+        <div id="regStatusBox" class="registry-status-box">
+          <div class="reg-status-dot closed" id="regDot"></div>
+          <span class="reg-status-text closed" id="regStatusText">Registration Closed</span>
+        </div>
+
+        <!-- Admin unlock -->
+        <div style="margin-top:1.5rem;">
+          <button class="lb-unlock-btn" id="regUnlockBtn" onclick="toggleRegPassword()">⚙ Admin Panel</button>
+        </div>
+
+        <div class="lb-password-row" id="regPasswordRow">
+          <input type="password" class="lb-password-input" id="regPasswordInput" placeholder="Enter password..." onkeydown="if(event.key==='Enter') submitRegPassword()" />
+          <button class="lb-password-submit" onclick="submitRegPassword()">Unlock</button>
+          <span class="lb-error" id="regPwError"></span>
+        </div>
+
+        <div class="reg-admin-panel" id="regAdminPanel">
+          <p style="font-size:0.7rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted);font-weight:700;">This Week's Topic</p>
+          <input type="text" class="reg-topic-input" id="regTopicInput" placeholder="e.g. Should villains have redemption arcs?" />
+          <div class="reg-admin-buttons">
+            <button class="reg-open-btn" onclick="openRegistration()">Open Registration</button>
+            <button class="reg-close-btn" onclick="closeRegistration()">Close Registration</button>
+            <button class="reg-clear-btn" onclick="clearRegistrants()">Clear List</button>
+          </div>
+        </div>
+
+        <!-- Registrants list (admin only) -->
+        <div class="reg-list-panel" id="regListPanel">
+          <p class="reg-list-title">
+            Registrants
+            <span class="reg-count-badge" id="regCountBadge">0</span>
+          </p>
+          <div class="reg-list" id="regList"></div>
+        </div>
+      </div>
+
+      <!-- RIGHT: FORM OR CLOSED BANNER -->
+      <div class="registry-form-area reveal">
+
+        <div class="reg-closed-banner show" id="regClosedBanner">
+          <div class="reg-closed-icon">🔒</div>
+          <p class="reg-closed-title">Slots for this week are finished</p>
+          <p class="reg-closed-sub">Check back when the admin opens the next session.</p>
+        </div>
+
+        <div class="reg-form" id="regForm">
+          <div class="reg-topic-display" id="regTopicDisplay">This week's topic will be announced shortly.</div>
+
+          <div class="reg-field">
+            <label class="reg-label" for="regName">Your Name</label>
+            <input type="text" class="reg-input" id="regName" placeholder="What do they call you?" maxlength="60" />
+          </div>
+
+          <div class="reg-field">
+            <label class="reg-label" for="regPhone">WhatsApp Number</label>
+            <input type="text" class="reg-input" id="regPhone" placeholder="e.g. 08012345678" maxlength="20" />
+          </div>
+
+          <button class="reg-submit" onclick="submitRegistration()">Secure My Spot 🔥</button>
+          <div class="reg-success" id="regSuccess">✓ You're registered! See you in the debate.</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="flame-divider"></div>
+
+<!-- LEADERBOARD -->
+<section id="leaderboard">
+  <div class="leaderboard-inner">
+    <div class="leaderboard-header reveal">
+      <div>
+        <p class="section-label">Standings</p>
+        <h2 class="section-title">The Scoreboard</h2>
+        <p class="section-desc">Where reputations are built and egos are checked.</p>
+      </div>
+      <button class="lb-unlock-btn" id="unlockBtn" onclick="togglePasswordRow()">⚙ Edit Mode</button>
+    </div>
+
+    <div class="lb-password-row" id="passwordRow">
+      <input type="password" class="lb-password-input" id="passwordInput" placeholder="Enter password..." onkeydown="if(event.key==='Enter') submitPassword()" />
+      <button class="lb-password-submit" onclick="submitPassword()">Unlock</button>
+      <span class="lb-error" id="pwError"></span>
+    </div>
+
+    <div class="leaderboard-grid">
+
+      <!-- HALL OF FAME -->
+      <div class="lb-board reveal">
+        <div class="lb-board-header">
+          <span class="lb-board-title fame">Hall of Fame</span>
+          <div style="display:flex;align-items:center;gap:0.75rem;">
+            <button class="lb-add-btn" id="addFameBtn" onclick="addRow('fame')">+ Add</button>
+            <span class="lb-board-icon">🏆</span>
+          </div>
+        </div>
+        <table class="lb-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Member</th>
+              <th>Wins</th>
+              <th class="lb-delete-col" style="display:none;"></th>
+            </tr>
+          </thead>
+          <tbody id="fameBody">
+            <tr><td colspan="4" class="lb-empty" id="fameEmpty">No winners yet. The flame hasn't chosen.</td></tr>
+          </tbody>
+        </table>
+        <div class="lb-save-bar" id="fameSaveBar">
+          <button class="lb-save-btn" onclick="saveBoard('fame')">Save Changes</button>
+        </div>
+      </div>
+
+      <!-- HALL OF SHAME -->
+      <div class="lb-board reveal">
+        <div class="lb-board-header">
+          <span class="lb-board-title shame">Hall of Shame</span>
+          <div style="display:flex;align-items:center;gap:0.75rem;">
+            <button class="lb-add-btn" id="addShameBtn" onclick="addRow('shame')">+ Add</button>
+            <span class="lb-board-icon">💀</span>
+          </div>
+        </div>
+        <table class="lb-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Member</th>
+              <th>Losses</th>
+              <th class="lb-delete-col" style="display:none;"></th>
+            </tr>
+          </thead>
+          <tbody id="shameBody">
+            <tr><td colspan="4" class="lb-empty" id="shameEmpty">No losses recorded. Everyone's still standing.</td></tr>
+          </tbody>
+        </table>
+        <div class="lb-save-bar" id="shameSaveBar">
+          <button class="lb-save-btn" onclick="saveBoard('shame')">Save Changes</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<div class="flame-divider"></div>
+
+<!-- JOIN -->
+<section id="join">
+  <div class="join-bg"></div>
+  <div class="join-inner reveal">
+    <p class="section-label" style="justify-content: center;">Ready?</p>
+    <h2 class="join-title">Join the Flame.</h2>
+    <p class="join-sub">
+      Reborn! is a WhatsApp community for those who come ready to argue well. No rage, no bad faith — just sharper thinking forged under pressure.
+    </p>
+    <div style="display:flex; gap:1rem; justify-content:center; flex-wrap:wrap;">
+      <a href="https://chat.whatsapp.com/JLBhXgOOdxgBIckM9CP8Vj" target="_blank" class="btn-primary">Join on WhatsApp</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <span class="footer-logo">REBORN!</span>
+  <p class="footer-text">© 2025 Reborn! Debate Community</p>
+  <ul class="footer-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#events">Events</a></li>
+    <li><a href="#resources">Resources</a></li>
+  </ul>
+</footer>
+
+<script>
+  // Scroll reveal
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('visible'), i * 80);
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // Nav scroll effect
+  const nav = document.querySelector('nav');
+  window.addEventListener('scroll', () => {
+    nav.style.borderBottomColor = window.scrollY > 50
+      ? 'rgba(255,107,0,0.35)'
+      : 'rgba(255,107,0,0.15)';
+  });
+
+  // ---- LEADERBOARD ----
+  const PASSWORD = 'tsunayoshi';
+  let editMode = false;
+
+  // Load from localStorage
+  let fameData = JSON.parse(localStorage.getItem('reborn_fame') || '[]');
+  let shameData = JSON.parse(localStorage.getItem('reborn_shame') || '[]');
+
+  renderBoard('fame');
+  renderBoard('shame');
+
+  function togglePasswordRow() {
+    const row = document.getElementById('passwordRow');
+    const btn = document.getElementById('unlockBtn');
+    if (editMode) {
+      exitEditMode();
+      return;
+    }
+    row.classList.toggle('visible');
+    btn.classList.toggle('active');
+    if (row.classList.contains('visible')) {
+      document.getElementById('passwordInput').focus();
+    }
+  }
+
+  function submitPassword() {
+    const val = document.getElementById('passwordInput').value;
+    const err = document.getElementById('pwError');
+    if (val === PASSWORD) {
+      err.textContent = '';
+      document.getElementById('passwordRow').classList.remove('visible');
+      document.getElementById('passwordInput').value = '';
+      enterEditMode();
+    } else {
+      err.textContent = 'Wrong password.';
+      document.getElementById('passwordInput').value = '';
+    }
+  }
+
+  function enterEditMode() {
+    editMode = true;
+    document.getElementById('unlockBtn').textContent = '✕ Exit Edit Mode';
+    document.getElementById('unlockBtn').classList.add('active');
+    document.getElementById('addFameBtn').classList.add('show');
+    document.getElementById('addShameBtn').classList.add('show');
+    document.querySelectorAll('.lb-delete-btn').forEach(b => b.classList.add('show'));
+    document.querySelectorAll('.lb-delete-col').forEach(c => c.style.display = '');
+    document.getElementById('fameSaveBar').classList.add('show');
+    document.getElementById('shameSaveBar').classList.add('show');
+    renderBoard('fame');
+    renderBoard('shame');
+  }
+
+  function exitEditMode() {
+    editMode = false;
+    document.getElementById('unlockBtn').textContent = '⚙ Edit Mode';
+    document.getElementById('unlockBtn').classList.remove('active');
+    document.getElementById('addFameBtn').classList.remove('show');
+    document.getElementById('addShameBtn').classList.remove('show');
+    document.getElementById('fameSaveBar').classList.remove('show');
+    document.getElementById('shameSaveBar').classList.remove('show');
+    renderBoard('fame');
+    renderBoard('shame');
+  }
+
+  function renderBoard(type) {
+    const data = type === 'fame' ? fameData : shameData;
+    const tbody = document.getElementById(type + 'Body');
+    const emptyId = type + 'Empty';
+    const scoreClass = type === 'fame' ? 'fame-score' : 'shame-score';
+    const colLabel = type === 'fame' ? 'Wins' : 'Losses';
+
+    tbody.innerHTML = '';
+
+    if (data.length === 0) {
+      const msg = type === 'fame'
+        ? 'No winners yet. The flame hasn\'t chosen.'
+        : 'No losses recorded. Everyone\'s still standing.';
+      tbody.innerHTML = `<tr><td colspan="4" class="lb-empty">${msg}</td></tr>`;
+      return;
+    }
+
+    // Sort descending
+    const sorted = [...data].sort((a, b) => b.score - a.score);
+
+    sorted.forEach((entry, i) => {
+      const rank = i + 1;
+      const tr = document.createElement('tr');
+      tr.className = 'lb-row';
+      tr.dataset.id = entry.id;
+
+      if (editMode) {
+        tr.innerHTML = `
+          <td class="lb-rank${rank === 1 ? ' top' : ''}">${rank}</td>
+          <td class="lb-name"><input class="lb-name-input" value="${entry.name}" onchange="updateEntry('${type}', '${entry.id}', 'name', this.value)" /></td>
+          <td class="lb-score ${scoreClass}"><input class="lb-score-input ${scoreClass}" type="number" min="0" value="${entry.score}" onchange="updateEntry('${type}', '${entry.id}', 'score', parseInt(this.value)||0)" /></td>
+          <td class="lb-delete-btn show" onclick="deleteEntry('${type}', '${entry.id}')">✕</td>
+        `;
+      } else {
+        tr.innerHTML = `
+          <td class="lb-rank${rank === 1 ? ' top' : ''}">${rank}</td>
+          <td class="lb-name">${entry.name}</td>
+          <td class="lb-score ${scoreClass}">${entry.score}</td>
+        `;
+      }
+
+      tbody.appendChild(tr);
+    });
+  }
+
+  function addRow(type) {
+    const data = type === 'fame' ? fameData : shameData;
+    if (data.length >= 3) {
+      alert('Maximum 3 entries per board. Remove one to add a new member.');
+      return;
+    }
+    const newEntry = { id: Date.now().toString(), name: 'New Member', score: 0 };
+    data.push(newEntry);
+    if (type === 'fame') fameData = data;
+    else shameData = data;
+    renderBoard(type);
+  }
+
+  function updateEntry(type, id, field, value) {
+    const data = type === 'fame' ? fameData : shameData;
+    const entry = data.find(e => e.id === id);
+    if (entry) entry[field] = value;
+  }
+
+  function deleteEntry(type, id) {
+    if (type === 'fame') fameData = fameData.filter(e => e.id !== id);
+    else shameData = shameData.filter(e => e.id !== id);
+    renderBoard(type);
+  }
+
+  function saveBoard(type) {
+    const data = type === 'fame' ? fameData : shameData;
+    localStorage.setItem('reborn_' + type, JSON.stringify(data));
+    const bar = document.getElementById(type + 'SaveBar');
+    const btn = bar.querySelector('.lb-save-btn');
+    btn.textContent = '✓ Saved';
+    btn.style.background = '#2a6e2a';
+    setTimeout(() => {
+      btn.textContent = 'Save Changes';
+      btn.style.background = '';
+      renderBoard(type);
+    }, 1500);
+  }
+
   // ---- REGISTRY ----
   let regAdminMode = false;
   let regState = JSON.parse(localStorage.getItem('reborn_reg') || '{"open":false,"topic":"","registrants":[]}');
