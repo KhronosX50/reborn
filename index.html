@@ -1484,6 +1484,7 @@
     <li><a href="#registry">Weekly Debate</a></li>
     <li><a href="#members">Members</a></li>
     <li><a href="#resources">Resources</a></li>
+    <li><a href="#rules">Rules</a></li>
     <li><a href="#leaderboard">Leaderboard</a></li>
     <li><a href="https://chat.whatsapp.com/JLBhXgOOdxgBIckM9CP8Vj" target="_blank" class="nav-cta">Join</a></li>
   </ul>
@@ -1690,7 +1691,7 @@
             <p class="resource-item-meta">Non-Fiction · 6 min read</p>
           </div>
         </div>
-        <div class="resource-item reveal">
+        <div class="resource-item reveal" onclick="document.getElementById('rules').scrollIntoView({behavior:'smooth'})" style="cursor:pointer;">
           <span class="resource-num">04</span>
           <div>
             <p class="resource-item-title">Rules of Engagement: Reborn! Debate Format</p>
@@ -1699,6 +1700,126 @@
         </div>
       </div>
     </div>
+  </div>
+</section>
+
+<div class="flame-divider"></div>
+
+<!-- RULES OF ENGAGEMENT -->
+<section id="rules">
+  <div style="max-width:900px;margin:0 auto;">
+
+    <div class="reveal" style="margin-bottom:3rem;">
+      <p class="section-label">Format</p>
+      <h2 class="section-title">Rules of Engagement</h2>
+      <p class="section-desc">The official Reborn! debate format. Read before you step into the arena.</p>
+    </div>
+
+    <!-- DEBATE STRUCTURE -->
+    <div class="reveal" style="margin-bottom:3rem;">
+      <p style="font-size:0.7rem;letter-spacing:0.4em;text-transform:uppercase;color:var(--flame-orange);font-weight:700;margin-bottom:1.5rem;">I. Debate Structure</p>
+
+      <div style="display:flex;flex-direction:column;gap:1rem;">
+
+        <div style="background:var(--card-bg);border:1px solid var(--border);padding:1.5rem 2rem;display:grid;grid-template-columns:2rem 1fr;gap:1.25rem;align-items:start;position:relative;overflow:hidden;">
+          <div style="position:absolute;top:0;left:0;width:3px;height:100%;background:linear-gradient(to bottom,var(--flame-orange),var(--flame-core));"></div>
+          <span style="font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:var(--flame-core);line-height:1;">1</span>
+          <div>
+            <p style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:0.08em;color:var(--white);margin-bottom:0.4rem;">Debater A — Win Condition</p>
+            <p style="font-family:'Crimson Pro',serif;font-size:0.95rem;color:var(--muted);line-height:1.6;">Debater A opens by stating their Win Condition — the specific argument, feat, or ability they believe secures victory for their character or position. This must be grounded in canon evidence.</p>
+          </div>
+        </div>
+
+        <div style="background:var(--card-bg);border:1px solid var(--border);padding:1.5rem 2rem;display:grid;grid-template-columns:2rem 1fr;gap:1.25rem;align-items:start;position:relative;overflow:hidden;">
+          <div style="position:absolute;top:0;left:0;width:3px;height:100%;background:linear-gradient(to bottom,var(--flame-orange),var(--flame-core));"></div>
+          <span style="font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:var(--flame-core);line-height:1;">2</span>
+          <div>
+            <p style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:0.08em;color:var(--white);margin-bottom:0.4rem;">Debater B — Resistance + Counter (Win Condition)</p>
+            <p style="font-family:'Crimson Pro',serif;font-size:0.95rem;color:var(--muted);line-height:1.6;">Debater B responds with two things in one move: a <strong style="color:var(--text);">Resistance</strong> that neutralises A's Win Condition, and a <strong style="color:var(--text);">Counter</strong> — which simultaneously serves as B's own Win Condition. Both must be supported with evidence.</p>
+          </div>
+        </div>
+
+        <div style="background:var(--card-bg);border:1px solid var(--border);padding:1.5rem 2rem;display:grid;grid-template-columns:2rem 1fr;gap:1.25rem;align-items:start;position:relative;overflow:hidden;">
+          <div style="position:absolute;top:0;left:0;width:3px;height:100%;background:linear-gradient(to bottom,var(--flame-orange),var(--flame-core));"></div>
+          <span style="font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:var(--flame-core);line-height:1;">3</span>
+          <div>
+            <p style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:0.08em;color:var(--white);margin-bottom:0.4rem;">Debater A — Resistance</p>
+            <p style="font-family:'Crimson Pro',serif;font-size:0.95rem;color:var(--muted);line-height:1.6;">Debater A responds to B's Counter/Win Condition with their own Resistance. This is A's final move. A must demonstrate why B's Win Condition does not hold against their character or argument.</p>
+          </div>
+        </div>
+
+        <div style="background:rgba(255,107,0,0.04);border:1px solid rgba(255,107,0,0.35);padding:1.5rem 2rem;display:grid;grid-template-columns:2rem 1fr;gap:1.25rem;align-items:start;position:relative;overflow:hidden;">
+          <div style="position:absolute;top:0;left:0;width:3px;height:100%;background:var(--flame-core);"></div>
+          <span style="font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:var(--flame-core);line-height:1;">⚖</span>
+          <div>
+            <p style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:0.08em;color:var(--flame-bright);margin-bottom:0.4rem;">Judges — Verdict</p>
+            <p style="font-family:'Crimson Pro',serif;font-size:0.95rem;color:var(--muted);line-height:1.6;">Judges evaluate both Win Conditions and all evidence presented. The verdict is based on the strength, consistency, and canon validity of each debater's arguments. The judge's decision is final.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- TIME LIMIT -->
+    <div class="reveal" style="margin-bottom:3rem;">
+      <p style="font-size:0.7rem;letter-spacing:0.4em;text-transform:uppercase;color:var(--flame-orange);font-weight:700;margin-bottom:1.5rem;">II. Time Limit</p>
+      <div style="background:var(--card-bg);border:1px solid var(--border);padding:1.5rem 2rem;">
+        <p style="font-family:'Crimson Pro',serif;font-size:1rem;color:var(--muted);line-height:1.8;">Each debater has <strong style="color:var(--flame-bright);">24 hours</strong> to post their argument from the moment it is their turn. Failure to respond within 24 hours results in an automatic forfeit of that round. Extensions may be granted at the admin's discretion under exceptional circumstances.</p>
+      </div>
+    </div>
+
+    <!-- EVIDENCE RULES -->
+    <div class="reveal" style="margin-bottom:3rem;">
+      <p style="font-size:0.7rem;letter-spacing:0.4em;text-transform:uppercase;color:var(--flame-orange);font-weight:700;margin-bottom:1.5rem;">III. Evidence & Validity Rules</p>
+      <div style="background:var(--card-bg);border:1px solid var(--border);padding:1.5rem 2rem;display:flex;flex-direction:column;gap:1rem;">
+
+        <div style="display:flex;gap:1rem;align-items:start;">
+          <span style="color:var(--flame-orange);font-weight:700;flex-shrink:0;">✓</span>
+          <p style="font-family:'Crimson Pro',serif;font-size:0.95rem;color:var(--muted);line-height:1.6;"><strong style="color:var(--text);">Canon sources only.</strong> All evidence must come from primary canon — manga, anime, light novels, databooks, or official statements from authors/creators. Fan wikis are not primary sources and cannot be cited as standalone evidence.</p>
+        </div>
+
+        <div style="display:flex;gap:1rem;align-items:start;">
+          <span style="color:var(--flame-orange);font-weight:700;flex-shrink:0;">✓</span>
+          <p style="font-family:'Crimson Pro',serif;font-size:0.95rem;color:var(--muted);line-height:1.6;"><strong style="color:var(--text);">No outlier feats.</strong> A feat is considered an outlier if it is a significant, unexplained anomaly that contradicts the character's consistent performance throughout the series. Outlier feats may not be used as a primary basis for a Win Condition.</p>
+        </div>
+
+        <div style="display:flex;gap:1rem;align-items:start;">
+          <span style="color:var(--flame-orange);font-weight:700;flex-shrink:0;">✓</span>
+          <p style="font-family:'Crimson Pro',serif;font-size:0.95rem;color:var(--muted);line-height:1.6;"><strong style="color:var(--text);">No wanking or lowballing.</strong> Arguments must represent a character's honest, consistent capabilities. Deliberately overstating or understating a character's abilities to win an argument is grounds for disqualification by the judges.</p>
+        </div>
+
+        <div style="display:flex;gap:1rem;align-items:start;">
+          <span style="color:var(--flame-orange);font-weight:700;flex-shrink:0;">✓</span>
+          <p style="font-family:'Crimson Pro',serif;font-size:0.95rem;color:var(--muted);line-height:1.6;"><strong style="color:var(--text);">Scaling must be logical and traceable.</strong> If you scale a character through another, each step of the scaling chain must be supported by explicit or strongly implied canon evidence. Vague or speculative scaling chains are invalid.</p>
+        </div>
+
+        <div style="display:flex;gap:1rem;align-items:start;">
+          <span style="color:var(--flame-orange);font-weight:700;flex-shrink:0;">✓</span>
+          <p style="font-family:'Crimson Pro',serif;font-size:0.95rem;color:var(--muted);line-height:1.6;"><strong style="color:var(--text);">Statements vs. feats.</strong> Demonstrated feats take priority over character statements. Author statements are admissible but may be challenged if they contradict in-universe evidence.</p>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- CONDUCT -->
+    <div class="reveal">
+      <p style="font-size:0.7rem;letter-spacing:0.4em;text-transform:uppercase;color:var(--flame-orange);font-weight:700;margin-bottom:1.5rem;">IV. Conduct</p>
+      <div style="background:var(--card-bg);border:1px solid var(--border);padding:1.5rem 2rem;display:flex;flex-direction:column;gap:1rem;">
+        <div style="display:flex;gap:1rem;align-items:start;">
+          <span style="color:#ef4444;font-weight:700;flex-shrink:0;">✗</span>
+          <p style="font-family:'Crimson Pro',serif;font-size:0.95rem;color:var(--muted);line-height:1.6;">Personal attacks, insults, or bad faith arguments are not tolerated. Debate the argument, not the person.</p>
+        </div>
+        <div style="display:flex;gap:1rem;align-items:start;">
+          <span style="color:#ef4444;font-weight:700;flex-shrink:0;">✗</span>
+          <p style="font-family:'Crimson Pro',serif;font-size:0.95rem;color:var(--muted);line-height:1.6;">Deliberate misrepresentation of an opponent's argument is prohibited. Engage with what was actually said.</p>
+        </div>
+        <div style="display:flex;gap:1rem;align-items:start;">
+          <span style="color:#ef4444;font-weight:700;flex-shrink:0;">✗</span>
+          <p style="font-family:'Crimson Pro',serif;font-size:0.95rem;color:var(--muted);line-height:1.6;">Judges' verdicts are final. Prolonged disputing of a verdict in the debate thread is considered unsportsmanlike conduct.</p>
+        </div>
+      </div>
+    </div>
+
   </div>
 </section>
 
@@ -1860,13 +1981,42 @@
         </div>
       </div>
 
+    </div><!-- end leaderboard-grid -->
+
+    <!-- OVERALL LEADERBOARD -->
+    <div style="margin-top:3rem;" class="reveal">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem;">
+        <div>
+          <p class="section-label">All Time</p>
+          <h3 style="font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:0.05em;color:var(--white);line-height:1;">Overall Standings</h3>
+        </div>
+        <button class="lb-add-btn" id="addOverallBtn" onclick="addOverallRow()">+ Add Member</button>
+      </div>
+
+      <div class="lb-board">
+        <table class="lb-table" style="width:100%;">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Member</th>
+              <th style="text-align:center;">Wins</th>
+              <th style="text-align:center;">Losses</th>
+              <th style="text-align:right;">Points</th>
+              <th id="overallDeleteCol" style="display:none;width:40px;"></th>
+            </tr>
+          </thead>
+          <tbody id="overallBody">
+            <tr><td colspan="6" class="lb-empty">No records yet. The season hasn't begun.</td></tr>
+          </tbody>
+        </table>
+        <div class="lb-save-bar" id="overallSaveBar">
+          <button class="lb-save-btn" onclick="saveOverall()">Save Changes</button>
+        </div>
+      </div>
     </div>
+
   </div>
 </section>
-
-<div class="flame-divider"></div>
-
-<!-- JOIN -->
 <section id="join">
   <div class="join-bg"></div>
   <div class="join-inner reveal">
@@ -1931,9 +2081,11 @@
   // Load from localStorage
   let fameData = JSON.parse(localStorage.getItem('reborn_fame') || '[]');
   let shameData = JSON.parse(localStorage.getItem('reborn_shame') || '[]');
+  let overallData = JSON.parse(localStorage.getItem('reborn_overall') || '[]');
 
   renderBoard('fame');
   renderBoard('shame');
+  renderOverall();
 
   function togglePasswordRow() {
     const row = document.getElementById('passwordRow');
@@ -1969,12 +2121,16 @@
     document.getElementById('unlockBtn').classList.add('active');
     document.getElementById('addFameBtn').classList.add('show');
     document.getElementById('addShameBtn').classList.add('show');
+    document.getElementById('addOverallBtn').classList.add('show');
     document.querySelectorAll('.lb-delete-btn').forEach(b => b.classList.add('show'));
     document.querySelectorAll('.lb-delete-col').forEach(c => c.style.display = '');
+    document.getElementById('overallDeleteCol').style.display = '';
     document.getElementById('fameSaveBar').classList.add('show');
     document.getElementById('shameSaveBar').classList.add('show');
+    document.getElementById('overallSaveBar').classList.add('show');
     renderBoard('fame');
     renderBoard('shame');
+    renderOverall();
   }
 
   function exitEditMode() {
@@ -1983,10 +2139,14 @@
     document.getElementById('unlockBtn').classList.remove('active');
     document.getElementById('addFameBtn').classList.remove('show');
     document.getElementById('addShameBtn').classList.remove('show');
+    document.getElementById('addOverallBtn').classList.remove('show');
     document.getElementById('fameSaveBar').classList.remove('show');
     document.getElementById('shameSaveBar').classList.remove('show');
+    document.getElementById('overallSaveBar').classList.remove('show');
+    document.getElementById('overallDeleteCol').style.display = 'none';
     renderBoard('fame');
     renderBoard('shame');
+    renderOverall();
   }
 
   function renderBoard(type) {
@@ -2071,6 +2231,82 @@
       btn.style.background = '';
       renderBoard(type);
     }, 1500);
+  }
+
+  function addOverallRow() {
+    const newEntry = { id: Date.now().toString(), name: 'New Member', wins: 0, losses: 0 };
+    overallData.push(newEntry);
+    renderOverall();
+  }
+
+  function updateOverallEntry(id, field, value) {
+    const entry = overallData.find(e => e.id === id);
+    if (entry) entry[field] = value;
+  }
+
+  function deleteOverallEntry(id) {
+    overallData = overallData.filter(e => e.id !== id);
+    renderOverall();
+  }
+
+  function saveOverall() {
+    localStorage.setItem('reborn_overall', JSON.stringify(overallData));
+    const bar = document.getElementById('overallSaveBar');
+    const btn = bar.querySelector('.lb-save-btn');
+    btn.textContent = '✓ Saved';
+    btn.style.background = '#2a6e2a';
+    setTimeout(() => {
+      btn.textContent = 'Save Changes';
+      btn.style.background = '';
+      renderOverall();
+    }, 1500);
+  }
+
+  function renderOverall() {
+    const tbody = document.getElementById('overallBody');
+    tbody.innerHTML = '';
+
+    if (overallData.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="6" class="lb-empty">No records yet. The season hasn\'t begun.</td></tr>';
+      return;
+    }
+
+    const sorted = [...overallData].sort((a, b) => (b.wins - b.losses) - (a.wins - a.losses));
+
+    sorted.forEach((entry, i) => {
+      const points = entry.wins - entry.losses;
+      const rank = i + 1;
+      const tr = document.createElement('tr');
+      tr.className = 'lb-row';
+
+      if (editMode) {
+        tr.innerHTML = `
+          <td class="lb-rank${rank === 1 ? ' top' : ''}">${rank}</td>
+          <td class="lb-name"><input class="lb-name-input" value="${entry.name}" onchange="updateOverallEntry('${entry.id}','name',this.value)" /></td>
+          <td style="text-align:center;padding:1rem 0.5rem;">
+            <input class="lb-score-input fame-score" type="number" min="0" value="${entry.wins}" style="width:45px;text-align:center;" onchange="updateOverallEntry('${entry.id}','wins',parseInt(this.value)||0)" />
+          </td>
+          <td style="text-align:center;padding:1rem 0.5rem;">
+            <input class="lb-score-input shame-score" type="number" min="0" value="${entry.losses}" style="width:45px;text-align:center;" onchange="updateOverallEntry('${entry.id}','losses',parseInt(this.value)||0)" />
+          </td>
+          <td class="lb-score ${points >= 0 ? 'fame-score' : 'shame-score'}" style="text-align:right;">${points >= 0 ? '+' : ''}${points}</td>
+          <td style="padding:1rem 1.75rem 1rem 0;text-align:right;">
+            <button onclick="deleteOverallEntry('${entry.id}')" style="background:transparent;border:none;color:rgba(255,68,68,0.5);cursor:pointer;font-size:0.9rem;" onmouseover="this.style.color='#ff4444'" onmouseout="this.style.color='rgba(255,68,68,0.5)'">✕</button>
+          </td>
+        `;
+      } else {
+        const pointColor = points > 0 ? 'var(--flame-core)' : points < 0 ? '#666' : 'var(--muted)';
+        tr.innerHTML = `
+          <td class="lb-rank${rank === 1 ? ' top' : ''}">${rank}</td>
+          <td class="lb-name">${entry.name}</td>
+          <td class="lb-score fame-score" style="text-align:center;">${entry.wins}</td>
+          <td class="lb-score shame-score" style="text-align:center;">${entry.losses}</td>
+          <td class="lb-score" style="text-align:right;color:${pointColor};">${points >= 0 ? '+' : ''}${points}</td>
+        `;
+      }
+
+      tbody.appendChild(tr);
+    });
   }
 
   // ---- REGISTRY (Supabase) ----
