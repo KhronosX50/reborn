@@ -1990,18 +1990,19 @@
           <p class="section-label">All Time</p>
           <h3 style="font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:0.05em;color:var(--white);line-height:1;">Overall Standings</h3>
         </div>
-        <button class="lb-add-btn" id="addOverallBtn" onclick="addOverallRow()">+ Add Member</button>
+        <button class="lb-add-btn" id="addOverallBtn" onclick="addOverallRow()" style="display:none;">+ Add Member</button>
       </div>
 
       <div class="lb-board">
-        <table class="lb-table" style="width:100%;">
+        <div style="overflow-x:auto;">
+        <table class="lb-table" style="width:100%;min-width:520px;">
           <thead>
             <tr>
-              <th>#</th>
+              <th style="width:40px;">#</th>
               <th>Member</th>
-              <th style="text-align:center;">Wins</th>
-              <th style="text-align:center;">Losses</th>
-              <th style="text-align:right;">Points</th>
+              <th style="text-align:center;width:70px;">Wins</th>
+              <th style="text-align:center;width:70px;">Losses</th>
+              <th style="text-align:right;width:80px;">Points</th>
               <th id="overallDeleteCol" style="display:none;width:40px;"></th>
             </tr>
           </thead>
@@ -2009,6 +2010,7 @@
             <tr><td colspan="6" class="lb-empty">No records yet. The season hasn't begun.</td></tr>
           </tbody>
         </table>
+        </div>
         <div class="lb-save-bar" id="overallSaveBar">
           <button class="lb-save-btn" onclick="saveOverall()">Save Changes</button>
         </div>
@@ -2121,7 +2123,7 @@
     document.getElementById('unlockBtn').classList.add('active');
     document.getElementById('addFameBtn').classList.add('show');
     document.getElementById('addShameBtn').classList.add('show');
-    document.getElementById('addOverallBtn').classList.add('show');
+    document.getElementById('addOverallBtn').style.display = 'flex';
     document.querySelectorAll('.lb-delete-btn').forEach(b => b.classList.add('show'));
     document.querySelectorAll('.lb-delete-col').forEach(c => c.style.display = '');
     document.getElementById('overallDeleteCol').style.display = '';
@@ -2139,7 +2141,7 @@
     document.getElementById('unlockBtn').classList.remove('active');
     document.getElementById('addFameBtn').classList.remove('show');
     document.getElementById('addShameBtn').classList.remove('show');
-    document.getElementById('addOverallBtn').classList.remove('show');
+    document.getElementById('addOverallBtn').style.display = 'none';
     document.getElementById('fameSaveBar').classList.remove('show');
     document.getElementById('shameSaveBar').classList.remove('show');
     document.getElementById('overallSaveBar').classList.remove('show');
@@ -2282,15 +2284,15 @@
       if (editMode) {
         tr.innerHTML = `
           <td class="lb-rank${rank === 1 ? ' top' : ''}">${rank}</td>
-          <td class="lb-name"><input class="lb-name-input" value="${entry.name}" onchange="updateOverallEntry('${entry.id}','name',this.value)" /></td>
-          <td style="text-align:center;padding:1rem 0.5rem;">
-            <input class="lb-score-input fame-score" type="number" min="0" value="${entry.wins}" style="width:45px;text-align:center;" onchange="updateOverallEntry('${entry.id}','wins',parseInt(this.value)||0)" />
+          <td class="lb-name" style="min-width:120px;"><input class="lb-name-input" style="width:100%;" value="${entry.name}" onchange="updateOverallEntry('${entry.id}','name',this.value)" /></td>
+          <td style="text-align:center;padding:0.75rem 0.5rem;">
+            <input class="lb-score-input fame-score" type="number" min="0" value="${entry.wins}" style="width:50px;text-align:center;" onchange="updateOverallEntry('${entry.id}','wins',parseInt(this.value)||0);renderOverall();" />
           </td>
-          <td style="text-align:center;padding:1rem 0.5rem;">
-            <input class="lb-score-input shame-score" type="number" min="0" value="${entry.losses}" style="width:45px;text-align:center;" onchange="updateOverallEntry('${entry.id}','losses',parseInt(this.value)||0)" />
+          <td style="text-align:center;padding:0.75rem 0.5rem;">
+            <input class="lb-score-input shame-score" type="number" min="0" value="${entry.losses}" style="width:50px;text-align:center;" onchange="updateOverallEntry('${entry.id}','losses',parseInt(this.value)||0);renderOverall();" />
           </td>
-          <td class="lb-score ${points >= 0 ? 'fame-score' : 'shame-score'}" style="text-align:right;">${points >= 0 ? '+' : ''}${points}</td>
-          <td style="padding:1rem 1.75rem 1rem 0;text-align:right;">
+          <td class="lb-score ${points >= 0 ? 'fame-score' : 'shame-score'}" style="text-align:right;padding:0.75rem 1.75rem;">${points >= 0 ? '+' : ''}${points}</td>
+          <td style="padding:0.75rem 1rem 0.75rem 0;text-align:right;">
             <button onclick="deleteOverallEntry('${entry.id}')" style="background:transparent;border:none;color:rgba(255,68,68,0.5);cursor:pointer;font-size:0.9rem;" onmouseover="this.style.color='#ff4444'" onmouseout="this.style.color='rgba(255,68,68,0.5)'">✕</button>
           </td>
         `;
