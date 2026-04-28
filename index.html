@@ -2282,14 +2282,14 @@
     }
 
     const sorted = [...overallData].sort((a, b) => {
-      const pa = a.wins - a.losses + (a.draws || 0) * 0.5;
-      const pb = b.wins - b.losses + (b.draws || 0) * 0.5;
+      const pa = Math.max(0, a.wins * 10 + (a.draws || 0) * 5 - a.losses * 5);
+      const pb = Math.max(0, b.wins * 10 + (b.draws || 0) * 5 - b.losses * 5);
       return pb - pa;
     });
 
     sorted.forEach((entry, i) => {
       const draws = entry.draws || 0;
-      const points = entry.wins - entry.losses + draws * 0.5;
+      const points = Math.max(0, entry.wins * 10 + draws * 5 - entry.losses * 5);
       const rank = i + 1;
       const tr = document.createElement('tr');
       tr.className = 'lb-row';
