@@ -1481,7 +1481,7 @@
   <ul class="nav-links">
     <li><a href="#about">About</a></li>
     <li><a href="#events">Events</a></li>
-    <li><a href="#registry">Weekly Debate</a></li>
+    <li><a href="#registry">Event Slots</a></li>
     <li><a href="#members">Members</a></li>
     <li><a href="#resources">Resources</a></li>
     <li><a href="#rules">Rules</a></li>
@@ -1578,10 +1578,10 @@
       <div class="event-card reveal" style="max-width: 500px;">
         <span class="event-type type-open">Weekly Debate</span>
         <h3 class="event-title">Weekly Debate Session</h3>
-        <p class="event-desc">Every week, members go head to head on a chosen topic — fiction or non-fiction. Register below to secure your spot for next week's session.</p>
+        <p class="event-desc">Every week, a poll is made in the community to select who debates. Check the weekly poll to see if you've been selected — then head to the Event Slots section to register for special events.</p>
         <div class="event-meta">
           <span class="event-date">Every Week</span>
-          <span class="event-slots">↓ Register Below</span>
+          <span class="event-slots">Check the Poll 🗳</span>
         </div>
       </div>
     </div>
@@ -1829,9 +1829,9 @@
 <section id="registry">
   <div class="registry-inner">
     <div class="registry-header reveal" style="margin-bottom:3rem;">
-      <p class="section-label">Weekly Debate</p>
-      <h2 class="section-title">Register to Debate</h2>
-      <p class="section-desc">Sign up for next week's debate session. Registration opens and closes at the admin's discretion.</p>
+      <p class="section-label">Event Slots</p>
+      <h2 class="section-title">Register for Events</h2>
+      <p class="section-desc">Special events are announced by the admin. When slots open, register here with your name and WhatsApp number to secure your place.</p>
     </div>
 
     <div class="registry-layout">
@@ -1855,8 +1855,8 @@
         </div>
 
         <div class="reg-admin-panel" id="regAdminPanel">
-          <p style="font-size:0.7rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted);font-weight:700;">This Week's Topic</p>
-          <input type="text" class="reg-topic-input" id="regTopicInput" placeholder="e.g. Should villains have redemption arcs?" />
+          <p style="font-size:0.7rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted);font-weight:700;">Event Name / Topic</p>
+          <input type="text" class="reg-topic-input" id="regTopicInput" placeholder="e.g. Fiction Debate — Round 1" />
           <div class="reg-admin-buttons">
             <button class="reg-open-btn" onclick="openRegistration()">Open Registration</button>
             <button class="reg-close-btn" onclick="closeRegistration()">Close Registration</button>
@@ -1879,8 +1879,8 @@
 
         <div class="reg-closed-banner show" id="regClosedBanner">
           <div class="reg-closed-icon">🔒</div>
-          <p class="reg-closed-title">Slots for this week are finished</p>
-          <p class="reg-closed-sub">Check back when the admin opens the next session.</p>
+          <p class="reg-closed-title">No Ongoing Event</p>
+          <p class="reg-closed-sub">Stay tuned. The admin will open slots when a new event is announced.</p>
         </div>
 
         <div class="reg-form" id="regForm">
