@@ -2324,7 +2324,6 @@
 
   function downloadStandings() {
     const canvas = document.createElement('canvas');
-    // A4 at 150dpi: 1240 x 1754
     const W = 1240, H = 1754;
     canvas.width = W;
     canvas.height = H;
@@ -2351,12 +2350,11 @@
 
     // Title
     ctx.fillStyle = '#FF6B00';
-    ctx.font = 'bold 28px Arial';
-    ctx.letterSpacing = '8px';
+    ctx.font = 'bold 28px "Times New Roman", Times, serif';
     ctx.fillText('REBORN! DEBATE COMMUNITY', 80, 90);
 
     ctx.fillStyle = '#FAFAFA';
-    ctx.font = 'bold 80px Arial';
+    ctx.font = 'bold 80px "Times New Roman", Times, serif';
     ctx.fillText('OVERALL STANDINGS', 80, 185);
 
     // Underline
@@ -2367,27 +2365,32 @@
 
     // Date
     ctx.fillStyle = '#8A8070';
-    ctx.font = '24px Arial';
+    ctx.font = '24px "Times New Roman", Times, serif';
     ctx.fillText('Generated: ' + new Date().toLocaleDateString('en-GB', {day:'numeric',month:'long',year:'numeric'}), 80, 250);
 
-    // Table header
+    // Column positions — points given more room
     const tableTop = 300;
     const rowH = 72;
-    const cols = { rank:80, name:200, wins:730, draws:870, losses:1010, points:1130 };
+    const cols = { rank:80, name:200, wins:700, draws:840, losses:980, points:1080 };
+    const tableW = W - 120;
 
+    // Table header
     ctx.fillStyle = '#10141F';
-    ctx.fillRect(60, tableTop, W - 120, rowH);
+    ctx.fillRect(60, tableTop, tableW, rowH);
     ctx.fillStyle = '#FF6B00';
     ctx.fillRect(60, tableTop, 4, rowH);
 
     ctx.fillStyle = '#8A8070';
-    ctx.font = 'bold 22px Arial';
+    ctx.font = 'bold 22px "Times New Roman", Times, serif';
     ctx.fillText('#', cols.rank, tableTop + 44);
     ctx.fillText('MEMBER', cols.name, tableTop + 44);
     ctx.fillText('W', cols.wins, tableTop + 44);
     ctx.fillText('D', cols.draws, tableTop + 44);
     ctx.fillText('L', cols.losses, tableTop + 44);
-    ctx.fillText('PTS', cols.points, tableTop + 44);
+    // Right-align PTS header
+    ctx.textAlign = 'right';
+    ctx.fillText('PTS', W - 70, tableTop + 44);
+    ctx.textAlign = 'left';
 
     // Rows
     const sorted = [...overallData].sort((a, b) => {
@@ -2402,37 +2405,39 @@
       const y = tableTop + rowH + i * rowH;
 
       ctx.fillStyle = i % 2 === 0 ? '#141824' : '#10141F';
-      ctx.fillRect(60, y, W - 120, rowH);
+      ctx.fillRect(60, y, tableW, rowH);
 
-      // Left accent for top 3
       if (i === 0) { ctx.fillStyle = '#FFD000'; ctx.fillRect(60, y, 4, rowH); }
       else if (i === 1) { ctx.fillStyle = '#C0C0C0'; ctx.fillRect(60, y, 4, rowH); }
       else if (i === 2) { ctx.fillStyle = '#CD7F32'; ctx.fillRect(60, y, 4, rowH); }
 
-      ctx.font = i === 0 ? 'bold 32px Arial' : '28px Arial';
+      ctx.font = i === 0 ? 'bold 32px "Times New Roman", Times, serif' : '28px "Times New Roman", Times, serif';
       ctx.fillStyle = i === 0 ? '#FFD000' : 'rgba(255,107,0,0.4)';
       ctx.fillText(i + 1, cols.rank, y + 44);
 
       ctx.fillStyle = '#E8E0D0';
-      ctx.font = 'bold 28px Arial';
+      ctx.font = 'bold 28px "Times New Roman", Times, serif';
       ctx.fillText(entry.name, cols.name, y + 44);
 
+      ctx.font = 'bold 28px "Times New Roman", Times, serif';
       ctx.fillStyle = '#FFD000';
-      ctx.font = 'bold 28px Arial';
       ctx.fillText(entry.wins, cols.wins, y + 44);
 
       ctx.fillStyle = '#FF9A00';
       ctx.fillText(draws, cols.draws, y + 44);
 
-      ctx.fillStyle = '#555';
+      ctx.fillStyle = '#666';
       ctx.fillText(entry.losses, cols.losses, y + 44);
 
-      ctx.fillStyle = points > 0 ? '#FFD000' : points < 0 ? '#555' : '#8A8070';
-      ctx.fillText((points >= 0 ? '+' : '') + points, cols.points, y + 44);
+      // Right-align points so they never clip
+      ctx.textAlign = 'right';
+      ctx.fillStyle = points > 0 ? '#FFD000' : points < 0 ? '#666' : '#8A8070';
+      ctx.font = 'bold 28px "Times New Roman", Times, serif';
+      ctx.fillText((points >= 0 ? '+' : '') + points, W - 70, y + 44);
+      ctx.textAlign = 'left';
 
-      // Row divider
       ctx.fillStyle = 'rgba(255,255,255,0.04)';
-      ctx.fillRect(60, y + rowH - 1, W - 120, 1);
+      ctx.fillRect(60, y + rowH - 1, tableW, 1);
     });
 
     // Bottom bar
@@ -2440,11 +2445,10 @@
     ctx.fillRect(0, H - 18, W, 18);
 
     ctx.fillStyle = '#8A8070';
-    ctx.font = '22px Arial';
+    ctx.font = '22px "Times New Roman", Times, serif';
     ctx.fillText('reborn-ruby.vercel.app', 80, H - 40);
     ctx.fillText('🔥 Where Words Combust', W - 380, H - 40);
 
-    // Download
     const link = document.createElement('a');
     link.download = 'reborn-standings.png';
     link.href = canvas.toDataURL('image/png');
