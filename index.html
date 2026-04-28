@@ -1995,23 +1995,25 @@
 
       <div class="lb-board">
         <div style="overflow-x:auto;">
-        <table class="lb-table" style="width:100%;min-width:520px;">
+        <table class="lb-table" style="width:100%;min-width:600px;">
           <thead>
             <tr>
               <th style="width:40px;">#</th>
               <th>Member</th>
-              <th style="text-align:center;width:70px;">Wins</th>
-              <th style="text-align:center;width:70px;">Losses</th>
+              <th style="text-align:center;width:65px;">Wins</th>
+              <th style="text-align:center;width:65px;">Draws</th>
+              <th style="text-align:center;width:65px;">Losses</th>
               <th style="text-align:right;width:80px;">Points</th>
               <th id="overallDeleteCol" style="display:none;width:40px;"></th>
             </tr>
           </thead>
           <tbody id="overallBody">
-            <tr><td colspan="6" class="lb-empty">No records yet. The season hasn't begun.</td></tr>
+            <tr><td colspan="7" class="lb-empty">No records yet. The season hasn't begun.</td></tr>
           </tbody>
         </table>
         </div>
-        <div class="lb-save-bar" id="overallSaveBar">
+        <div class="lb-save-bar" id="overallSaveBar" style="justify-content:space-between;">
+          <button class="lb-save-btn" style="background:rgba(255,255,255,0.08);color:var(--text);" onclick="downloadStandings()">⬇ Download as Image</button>
           <button class="lb-save-btn" onclick="saveOverall()">Save Changes</button>
         </div>
       </div>
@@ -2236,7 +2238,7 @@
   }
 
   function addOverallRow() {
-    const newEntry = { id: Date.now().toString(), name: 'New Member', wins: 0, losses: 0 };
+    const newEntry = { id: Date.now().toString(), name: 'New Member', wins: 0, draws: 0, losses: 0 };
     overallData.push(newEntry);
     renderOverall();
   }
@@ -2269,14 +2271,19 @@
     tbody.innerHTML = '';
 
     if (overallData.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="6" class="lb-empty">No records yet. The season hasn\'t begun.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="7" class="lb-empty">No records yet. The season hasn\'t begun.</td></tr>';
       return;
     }
 
-    const sorted = [...overallData].sort((a, b) => (b.wins - b.losses) - (a.wins - a.losses));
+    const sorted = [...overallData].sort((a, b) => {
+      const pa = a.wins - a.losses + (a.draws || 0) * 0.5;
+      const pb = b.wins - b.losses + (b.draws || 0) * 0.5;
+      return pb - pa;
+    });
 
     sorted.forEach((entry, i) => {
-      const points = entry.wins - entry.losses;
+      const draws = entry.draws || 0;
+      const points = entry.wins - entry.losses + draws * 0.5;
       const rank = i + 1;
       const tr = document.createElement('tr');
       tr.className = 'lb-row';
@@ -2286,10 +2293,13 @@
           <td class="lb-rank${rank === 1 ? ' top' : ''}">${rank}</td>
           <td class="lb-name" style="min-width:120px;"><input class="lb-name-input" style="width:100%;" value="${entry.name}" onchange="updateOverallEntry('${entry.id}','name',this.value)" /></td>
           <td style="text-align:center;padding:0.75rem 0.5rem;">
-            <input class="lb-score-input fame-score" type="number" min="0" value="${entry.wins}" style="width:50px;text-align:center;" onchange="updateOverallEntry('${entry.id}','wins',parseInt(this.value)||0);renderOverall();" />
+            <input class="lb-score-input fame-score" type="number" min="0" value="${entry.wins}" style="width:48px;text-align:center;" onchange="updateOverallEntry('${entry.id}','wins',parseInt(this.value)||0);renderOverall();" />
           </td>
           <td style="text-align:center;padding:0.75rem 0.5rem;">
-            <input class="lb-score-input shame-score" type="number" min="0" value="${entry.losses}" style="width:50px;text-align:center;" onchange="updateOverallEntry('${entry.id}','losses',parseInt(this.value)||0);renderOverall();" />
+            <input class="lb-score-input" type="number" min="0" value="${draws}" style="width:48px;text-align:center;color:var(--flame-bright);border-bottom-color:rgba(255,154,0,0.4);" onchange="updateOverallEntry('${entry.id}','draws',parseInt(this.value)||0);renderOverall();" />
+          </td>
+          <td style="text-align:center;padding:0.75rem 0.5rem;">
+            <input class="lb-score-input shame-score" type="number" min="0" value="${entry.losses}" style="width:48px;text-align:center;" onchange="updateOverallEntry('${entry.id}','losses',parseInt(this.value)||0);renderOverall();" />
           </td>
           <td class="lb-score ${points >= 0 ? 'fame-score' : 'shame-score'}" style="text-align:right;padding:0.75rem 1.75rem;">${points >= 0 ? '+' : ''}${points}</td>
           <td style="padding:0.75rem 1rem 0.75rem 0;text-align:right;">
@@ -2302,6 +2312,7 @@
           <td class="lb-rank${rank === 1 ? ' top' : ''}">${rank}</td>
           <td class="lb-name">${entry.name}</td>
           <td class="lb-score fame-score" style="text-align:center;">${entry.wins}</td>
+          <td class="lb-score" style="text-align:center;color:var(--flame-bright);">${draws}</td>
           <td class="lb-score shame-score" style="text-align:center;">${entry.losses}</td>
           <td class="lb-score" style="text-align:right;color:${pointColor};">${points >= 0 ? '+' : ''}${points}</td>
         `;
@@ -2309,6 +2320,135 @@
 
       tbody.appendChild(tr);
     });
+  }
+
+  function downloadStandings() {
+    const canvas = document.createElement('canvas');
+    // A4 at 150dpi: 1240 x 1754
+    const W = 1240, H = 1754;
+    canvas.width = W;
+    canvas.height = H;
+    const ctx = canvas.getContext('2d');
+
+    // Background
+    ctx.fillStyle = '#080C1A';
+    ctx.fillRect(0, 0, W, H);
+
+    // Top bar
+    const grad = ctx.createLinearGradient(0, 0, W, 0);
+    grad.addColorStop(0, '#FF6B00');
+    grad.addColorStop(0.4, '#FFD000');
+    grad.addColorStop(1, '#FF6B00');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, W, 18);
+
+    // Glow
+    const glow = ctx.createRadialGradient(W/2, H, 0, W/2, H, 700);
+    glow.addColorStop(0, 'rgba(255,107,0,0.18)');
+    glow.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = glow;
+    ctx.fillRect(0, 0, W, H);
+
+    // Title
+    ctx.fillStyle = '#FF6B00';
+    ctx.font = 'bold 28px Arial';
+    ctx.letterSpacing = '8px';
+    ctx.fillText('REBORN! DEBATE COMMUNITY', 80, 90);
+
+    ctx.fillStyle = '#FAFAFA';
+    ctx.font = 'bold 80px Arial';
+    ctx.fillText('OVERALL STANDINGS', 80, 185);
+
+    // Underline
+    ctx.fillStyle = '#FF6B00';
+    ctx.fillRect(80, 200, 500, 4);
+    ctx.fillStyle = '#FFD000';
+    ctx.fillRect(80, 200, 120, 4);
+
+    // Date
+    ctx.fillStyle = '#8A8070';
+    ctx.font = '24px Arial';
+    ctx.fillText('Generated: ' + new Date().toLocaleDateString('en-GB', {day:'numeric',month:'long',year:'numeric'}), 80, 250);
+
+    // Table header
+    const tableTop = 300;
+    const rowH = 72;
+    const cols = { rank:80, name:200, wins:730, draws:870, losses:1010, points:1130 };
+
+    ctx.fillStyle = '#10141F';
+    ctx.fillRect(60, tableTop, W - 120, rowH);
+    ctx.fillStyle = '#FF6B00';
+    ctx.fillRect(60, tableTop, 4, rowH);
+
+    ctx.fillStyle = '#8A8070';
+    ctx.font = 'bold 22px Arial';
+    ctx.fillText('#', cols.rank, tableTop + 44);
+    ctx.fillText('MEMBER', cols.name, tableTop + 44);
+    ctx.fillText('W', cols.wins, tableTop + 44);
+    ctx.fillText('D', cols.draws, tableTop + 44);
+    ctx.fillText('L', cols.losses, tableTop + 44);
+    ctx.fillText('PTS', cols.points, tableTop + 44);
+
+    // Rows
+    const sorted = [...overallData].sort((a, b) => {
+      const pa = a.wins - a.losses + (a.draws||0)*0.5;
+      const pb = b.wins - b.losses + (b.draws||0)*0.5;
+      return pb - pa;
+    });
+
+    sorted.forEach((entry, i) => {
+      const draws = entry.draws || 0;
+      const points = entry.wins - entry.losses + draws * 0.5;
+      const y = tableTop + rowH + i * rowH;
+
+      ctx.fillStyle = i % 2 === 0 ? '#141824' : '#10141F';
+      ctx.fillRect(60, y, W - 120, rowH);
+
+      // Left accent for top 3
+      if (i === 0) { ctx.fillStyle = '#FFD000'; ctx.fillRect(60, y, 4, rowH); }
+      else if (i === 1) { ctx.fillStyle = '#C0C0C0'; ctx.fillRect(60, y, 4, rowH); }
+      else if (i === 2) { ctx.fillStyle = '#CD7F32'; ctx.fillRect(60, y, 4, rowH); }
+
+      ctx.font = i === 0 ? 'bold 32px Arial' : '28px Arial';
+      ctx.fillStyle = i === 0 ? '#FFD000' : 'rgba(255,107,0,0.4)';
+      ctx.fillText(i + 1, cols.rank, y + 44);
+
+      ctx.fillStyle = '#E8E0D0';
+      ctx.font = 'bold 28px Arial';
+      ctx.fillText(entry.name, cols.name, y + 44);
+
+      ctx.fillStyle = '#FFD000';
+      ctx.font = 'bold 28px Arial';
+      ctx.fillText(entry.wins, cols.wins, y + 44);
+
+      ctx.fillStyle = '#FF9A00';
+      ctx.fillText(draws, cols.draws, y + 44);
+
+      ctx.fillStyle = '#555';
+      ctx.fillText(entry.losses, cols.losses, y + 44);
+
+      ctx.fillStyle = points > 0 ? '#FFD000' : points < 0 ? '#555' : '#8A8070';
+      ctx.fillText((points >= 0 ? '+' : '') + points, cols.points, y + 44);
+
+      // Row divider
+      ctx.fillStyle = 'rgba(255,255,255,0.04)';
+      ctx.fillRect(60, y + rowH - 1, W - 120, 1);
+    });
+
+    // Bottom bar
+    ctx.fillStyle = '#FF6B00';
+    ctx.fillRect(0, H - 18, W, 18);
+
+    ctx.fillStyle = '#8A8070';
+    ctx.font = '22px Arial';
+    ctx.fillText('reborn-ruby.vercel.app', 80, H - 40);
+    ctx.fillText('🔥 Where Words Combust', W - 380, H - 40);
+
+    // Download
+    const link = document.createElement('a');
+    link.download = 'reborn-standings.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
   }
 
   // ---- REGISTRY (Supabase) ----
