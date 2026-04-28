@@ -1989,6 +1989,12 @@
         <div>
           <p class="section-label">All Time</p>
           <h3 style="font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:0.05em;color:var(--white);line-height:1;">Overall Standings</h3>
+          <p style="margin-top:0.75rem;font-size:0.8rem;font-family:'Rajdhani',sans-serif;color:var(--muted);letter-spacing:0.05em;">
+            <span style="color:var(--flame-core);font-weight:700;">Win +10pts</span> &nbsp;·&nbsp;
+            <span style="color:var(--flame-bright);font-weight:700;">Draw +5pts</span> &nbsp;·&nbsp;
+            <span style="color:#666;font-weight:700;">Loss −5pts</span> &nbsp;·&nbsp;
+            <span style="color:var(--muted);">Minimum 0pts</span>
+          </p>
         </div>
         <button class="lb-add-btn" id="addOverallBtn" onclick="addOverallRow()" style="display:none;">+ Add Member</button>
       </div>
@@ -2301,7 +2307,7 @@
           <td style="text-align:center;padding:0.75rem 0.5rem;">
             <input class="lb-score-input shame-score" type="number" min="0" value="${entry.losses}" style="width:48px;text-align:center;" onchange="updateOverallEntry('${entry.id}','losses',parseInt(this.value)||0);renderOverall();" />
           </td>
-          <td class="lb-score ${points >= 0 ? 'fame-score' : 'shame-score'}" style="text-align:right;padding:0.75rem 1.75rem;">${points >= 0 ? '+' : ''}${points}</td>
+          <td class="lb-score ${points > 0 ? 'fame-score' : ''}" style="text-align:right;padding:0.75rem 1.75rem;">${points}</td>
           <td style="padding:0.75rem 1rem 0.75rem 0;text-align:right;">
             <button onclick="deleteOverallEntry('${entry.id}')" style="background:transparent;border:none;color:rgba(255,68,68,0.5);cursor:pointer;font-size:0.9rem;" onmouseover="this.style.color='#ff4444'" onmouseout="this.style.color='rgba(255,68,68,0.5)'">✕</button>
           </td>
@@ -2314,7 +2320,7 @@
           <td class="lb-score fame-score" style="text-align:center;">${entry.wins}</td>
           <td class="lb-score" style="text-align:center;color:var(--flame-bright);">${draws}</td>
           <td class="lb-score shame-score" style="text-align:center;">${entry.losses}</td>
-          <td class="lb-score" style="text-align:right;color:${pointColor};">${points >= 0 ? '+' : ''}${points}</td>
+          <td class="lb-score" style="text-align:right;color:${points > 0 ? 'var(--flame-core)' : 'var(--muted)'};">${points}</td>
         `;
       }
 
@@ -2394,14 +2400,14 @@
 
     // Rows
     const sorted = [...overallData].sort((a, b) => {
-      const pa = a.wins - a.losses + (a.draws||0)*0.5;
-      const pb = b.wins - b.losses + (b.draws||0)*0.5;
+      const pa = Math.max(0, a.wins * 10 + (a.draws||0) * 5 - a.losses * 5);
+      const pb = Math.max(0, b.wins * 10 + (b.draws||0) * 5 - b.losses * 5);
       return pb - pa;
     });
 
     sorted.forEach((entry, i) => {
       const draws = entry.draws || 0;
-      const points = entry.wins - entry.losses + draws * 0.5;
+      const points = Math.max(0, entry.wins * 10 + draws * 5 - entry.losses * 5);
       const y = tableTop + rowH + i * rowH;
 
       ctx.fillStyle = i % 2 === 0 ? '#141824' : '#10141F';
