@@ -2435,11 +2435,10 @@
       ctx.fillStyle = '#666';
       ctx.fillText(entry.losses, cols.losses, y + 44);
 
-      // Right-align points so they never clip
       ctx.textAlign = 'right';
-      ctx.fillStyle = points > 0 ? '#FFD000' : points < 0 ? '#666' : '#8A8070';
+      ctx.fillStyle = points > 0 ? '#FFD000' : '#8A8070';
       ctx.font = 'bold 28px "Times New Roman", Times, serif';
-      ctx.fillText((points >= 0 ? '+' : '') + points, W - 70, y + 44);
+      ctx.fillText(points, W - 70, y + 44);
       ctx.textAlign = 'left';
 
       ctx.fillStyle = 'rgba(255,255,255,0.04)';
