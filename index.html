@@ -1465,8 +1465,98 @@
     margin-right: 0.75rem;
   }
 
+  /* RANKS */
+  #ranks { background: linear-gradient(180deg, var(--dark-surface), var(--deep-navy)); }
+
+  .ranks-inner { max-width: 1200px; margin: 0 auto; }
+
+  .ranks-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.25rem;
+    margin-top: 3rem;
+  }
+
+  .rank-tier {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    padding: 1.5rem;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.3s;
+  }
+
+  .rank-tier:hover { border-color: rgba(255,107,0,0.4); }
+
+  .rank-tier-accent {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 3px;
+  }
+
+  .rank-tier-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 0.4rem;
+  }
+
+  .rank-tier-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.4rem;
+    letter-spacing: 0.08em;
+    color: var(--white);
+    margin-bottom: 0.25rem;
+  }
+
+  .rank-tier-pts {
+    font-size: 0.75rem;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    margin-bottom: 1.25rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+
+  .rank-members-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    min-height: 40px;
+  }
+
+  .rank-member-entry {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .rank-member-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .rank-empty {
+    font-family: 'Crimson Pro', serif;
+    font-style: italic;
+    color: var(--muted);
+    font-size: 0.85rem;
+  }
+
+  .rank-member-pts {
+    margin-left: auto;
+    font-size: 0.75rem;
+    color: var(--muted);
+    font-weight: 400;
+  }
+
   @media (max-width: 768px) {
-    .registry-layout { grid-template-columns: 1fr; gap: 2.5rem; }
+    .ranks-grid { grid-template-columns: 1fr; }
   }
 </style>
 </head>
@@ -1486,6 +1576,7 @@
     <li><a href="#resources">Resources</a></li>
     <li><a href="#rules">Rules</a></li>
     <li><a href="#leaderboard">Leaderboard</a></li>
+    <li><a href="#ranks">Ranks</a></li>
     <li><a href="https://chat.whatsapp.com/JLBhXgOOdxgBIckM9CP8Vj" target="_blank" class="nav-cta">Join</a></li>
   </ul>
 </nav>
@@ -2027,6 +2118,25 @@
 
   </div>
 </section>
+<div class="flame-divider"></div>
+
+<!-- RANKS -->
+<section id="ranks">
+  <div class="ranks-inner">
+    <div class="reveal">
+      <p class="section-label">Titles</p>
+      <h2 class="section-title">Member Ranks</h2>
+      <p class="section-desc">Ranks are earned through points. Every member in the Overall Standings is automatically placed in their tier.</p>
+    </div>
+
+    <div class="ranks-grid" id="ranksGrid">
+      <!-- Populated by JS -->
+    </div>
+  </div>
+</section>
+
+<div class="flame-divider"></div>
+
 <section id="join">
   <div class="join-bg"></div>
   <div class="join-inner reveal">
@@ -2098,12 +2208,13 @@
       sbFetch('/rest/v1/leaderboard?type=eq.shame&select=id,name,score&order=score.desc'),
       sbFetch('/rest/v1/overall_standings?select=id,name,wins,draws,losses')
     ]);
-    fameData  = fame    || [];
-    shameData = shame   || [];
+    fameData    = fame    || [];
+    shameData   = shame   || [];
     overallData = overall || [];
     renderBoard('fame');
     renderBoard('shame');
     renderOverall();
+    renderRanks();
   }
 
   loadAllBoards();
@@ -2478,6 +2589,63 @@
     link.download = 'reborn-standings.png';
     link.href = canvas.toDataURL('image/png');
     link.click();
+  }
+
+  // ---- RANKS ----
+  const RANK_TIERS = [
+    { name: 'Vongola Decimo',      min: 200, color: '#FFD000', accent: 'linear-gradient(90deg,#FFD000,#FF9A00)' },
+    { name: 'Vongola Guardian',    min: 150, color: '#FF9A00', accent: 'linear-gradient(90deg,#FF9A00,#FF6B00)' },
+    { name: 'Arcobaleno',          min: 100, color: '#FF6B00', accent: 'linear-gradient(90deg,#FF6B00,#cc3300)' },
+    { name: 'Arcobaleno Candidate',min: 60,  color: '#cc5500', accent: 'linear-gradient(90deg,#cc5500,#884400)' },
+    { name: 'Kokuyo Gang',         min: 30,  color: '#7A6040', accent: 'linear-gradient(90deg,#7A6040,#503020)' },
+    { name: 'Disciplinary Committee', min: 10, color: '#556070', accent: 'linear-gradient(90deg,#556070,#334050)' },
+    { name: 'Namimori Civilian',   min: 0,   color: '#4A4A4A', accent: 'linear-gradient(90deg,#4A4A4A,#2A2A2A)' },
+  ];
+
+  function getPoints(entry) {
+    return Math.max(0, (entry.wins||0)*10 + (entry.draws||0)*5 - (entry.losses||0)*5);
+  }
+
+  function getTier(pts) {
+    return RANK_TIERS.find(t => pts >= t.min) || RANK_TIERS[RANK_TIERS.length - 1];
+  }
+
+  function renderRanks() {
+    const grid = document.getElementById('ranksGrid');
+    if (!grid) return;
+    grid.innerHTML = '';
+
+    RANK_TIERS.forEach(tier => {
+      const members = overallData.filter(e => {
+        const pts = getPoints(e);
+        const myTier = getTier(pts);
+        return myTier.name === tier.name;
+      });
+
+      const card = document.createElement('div');
+      card.className = 'rank-tier reveal';
+      card.innerHTML = `
+        <div class="rank-tier-accent" style="background:${tier.accent};"></div>
+        <p class="rank-tier-label" style="color:${tier.color};">Rank Tier</p>
+        <p class="rank-tier-name">${tier.name}</p>
+        <p class="rank-tier-pts">${tier.min}${tier.min === 200 ? '+' : '–' + (RANK_TIERS[RANK_TIERS.indexOf(tier)-1] ? RANK_TIERS[RANK_TIERS.indexOf(tier)-1].min - 1 : '+')} pts</p>
+        <div class="rank-members-list">
+          ${members.length === 0
+            ? '<span class="rank-empty">No members yet</span>'
+            : members.map(m => `
+              <div class="rank-member-entry">
+                <div class="rank-member-dot" style="background:${tier.color};box-shadow:0 0 6px ${tier.color};"></div>
+                <span>${m.name}</span>
+                <span class="rank-member-pts">${getPoints(m)} pts</span>
+              </div>`).join('')
+          }
+        </div>
+      `;
+      grid.appendChild(card);
+    });
+
+    // Re-observe new reveal elements
+    document.querySelectorAll('.rank-tier.reveal:not(.visible)').forEach(el => observer.observe(el));
   }
 
   // ---- REGISTRY (Supabase) ----
