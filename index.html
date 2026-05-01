@@ -2352,13 +2352,14 @@
     const btn = bar.querySelector('.lb-save-btn');
     btn.textContent = 'Saving...';
 
-    // Delete all existing rows of this type then re-insert
+    // Delete removed entries, upsert existing ones
     await sbFetch(`/rest/v1/leaderboard?type=eq.${type}`, { method: 'DELETE' });
+
     if (data.length > 0) {
-      await sbFetch('/rest/v1/leaderboard', {
+      const res = await sbFetch('/rest/v1/leaderboard', {
         method: 'POST',
-        prefer: 'return=minimal',
-        body: JSON.stringify(data.map(e => ({ id: e.id, type, name: e.name, score: e.score })))
+        headers: { 'Prefer': 'resolution=merge-duplicates,return=minimal' },
+        body: JSON.stringify(data.map(e => ({ id: e.id, type, name: e.name, score: Number(e.score) || 0 })))
       });
     }
 
@@ -2367,34 +2368,29 @@
     setTimeout(() => { btn.textContent = 'Save Changes'; btn.style.background = ''; loadAllBoards(); }, 1500);
   }
 
-  function addOverallRow() {
-    const newEntry = { id: Date.now().toString(), name: 'New Member', wins: 0, draws: 0, losses: 0 };
-    overallData.push(newEntry);
-    renderOverall();
-  }
-
-  function updateOverallEntry(id, field, value) {
-    const entry = overallData.find(e => e.id === id);
-    if (entry) entry[field] = value;
-  }
-
-  function deleteOverallEntry(id) {
-    overallData = overallData.filter(e => e.id !== id);
-    renderOverall();
-  }
-
   async function saveOverall() {
     const bar = document.getElementById('overallSaveBar');
     const btn = bar.querySelector('.lb-save-btn:last-child');
     btn.textContent = 'Saving...';
 
-    // Delete all then re-insert
-    await sbFetch('/rest/v1/overall_standings?id=neq.null', { method: 'DELETE' });
+    // Fetch existing IDs then delete them all
+    const existing = await sbFetch('/rest/v1/overall_standings?select=id');
+    if (existing && existing.length > 0) {
+      const ids = existing.map(r => r.id).join(',');
+      await sbFetch(`/rest/v1/overall_standings?id=in.(${ids})`, { method: 'DELETE' });
+    }
+
     if (overallData.length > 0) {
       await sbFetch('/rest/v1/overall_standings', {
         method: 'POST',
-        prefer: 'return=minimal',
-        body: JSON.stringify(overallData.map(e => ({ id: e.id, name: e.name, wins: e.wins || 0, draws: e.draws || 0, losses: e.losses || 0 })))
+        headers: { 'Prefer': 'return=minimal' },
+        body: JSON.stringify(overallData.map(e => ({
+          id: e.id,
+          name: e.name,
+          wins: Number(e.wins) || 0,
+          draws: Number(e.draws) || 0,
+          losses: Number(e.losses) || 0
+        })))
       });
     }
 
@@ -2593,21 +2589,21 @@
 
   // ---- RANKS ----
   const RANK_TIERS = [
-    { name: 'Vongola Decimo',      min: 200, color: '#FFD000', accent: 'linear-gradient(90deg,#FFD000,#FF9A00)' },
-    { name: 'Vongola Guardian',    min: 150, color: '#FF9A00', accent: 'linear-gradient(90deg,#FF9A00,#FF6B00)' },
-    { name: 'Arcobaleno',          min: 100, color: '#FF6B00', accent: 'linear-gradient(90deg,#FF6B00,#cc3300)' },
-    { name: 'Arcobaleno Candidate',min: 60,  color: '#cc5500', accent: 'linear-gradient(90deg,#cc5500,#884400)' },
-    { name: 'Kokuyo Gang',         min: 30,  color: '#7A6040', accent: 'linear-gradient(90deg,#7A6040,#503020)' },
-    { name: 'Disciplinary Committee', min: 10, color: '#556070', accent: 'linear-gradient(90deg,#556070,#334050)' },
-    { name: 'Namimori Civilian',   min: 0,   color: '#4A4A4A', accent: 'linear-gradient(90deg,#4A4A4A,#2A2A2A)' },
+    { name: 'Vongola Decimo',         min: 200, max: Infinity, color: '#FFD000', accent: 'linear-gradient(90deg,#FFD000,#FF9A00)' },
+    { name: 'Vongola Guardian',        min: 150, max: 199,     color: '#FF9A00', accent: 'linear-gradient(90deg,#FF9A00,#FF6B00)' },
+    { name: 'Arcobaleno',              min: 100, max: 149,     color: '#FF6B00', accent: 'linear-gradient(90deg,#FF6B00,#cc3300)' },
+    { name: 'Arcobaleno Candidate',    min: 60,  max: 99,      color: '#cc5500', accent: 'linear-gradient(90deg,#cc5500,#884400)' },
+    { name: 'Kokuyo Gang',             min: 30,  max: 59,      color: '#7A6040', accent: 'linear-gradient(90deg,#7A6040,#503020)' },
+    { name: 'Disciplinary Committee',  min: 10,  max: 29,      color: '#556070', accent: 'linear-gradient(90deg,#556070,#334050)' },
+    { name: 'Namimori Civilian',       min: 0,   max: 9,       color: '#4A4A4A', accent: 'linear-gradient(90deg,#4A4A4A,#2A2A2A)' },
   ];
 
   function getPoints(entry) {
     return Math.max(0, (entry.wins||0)*10 + (entry.draws||0)*5 - (entry.losses||0)*5);
   }
 
-  function getTier(pts) {
-    return RANK_TIERS.find(t => pts >= t.min) || RANK_TIERS[RANK_TIERS.length - 1];
+  function getTierForPoints(pts) {
+    return RANK_TIERS.find(t => pts >= t.min && pts <= t.max) || RANK_TIERS[RANK_TIERS.length - 1];
   }
 
   function renderRanks() {
@@ -2618,9 +2614,11 @@
     RANK_TIERS.forEach(tier => {
       const members = overallData.filter(e => {
         const pts = getPoints(e);
-        const myTier = getTier(pts);
-        return myTier.name === tier.name;
+        const t = getTierForPoints(pts);
+        return t.name === tier.name;
       });
+
+      const rangeLabel = tier.max === Infinity ? `${tier.min}+ pts` : `${tier.min}–${tier.max} pts`;
 
       const card = document.createElement('div');
       card.className = 'rank-tier reveal';
@@ -2628,7 +2626,7 @@
         <div class="rank-tier-accent" style="background:${tier.accent};"></div>
         <p class="rank-tier-label" style="color:${tier.color};">Rank Tier</p>
         <p class="rank-tier-name">${tier.name}</p>
-        <p class="rank-tier-pts">${tier.min}${tier.min === 200 ? '+' : '–' + (RANK_TIERS[RANK_TIERS.indexOf(tier)-1] ? RANK_TIERS[RANK_TIERS.indexOf(tier)-1].min - 1 : '+')} pts</p>
+        <p class="rank-tier-pts">${rangeLabel}</p>
         <div class="rank-members-list">
           ${members.length === 0
             ? '<span class="rank-empty">No members yet</span>'
@@ -2642,10 +2640,10 @@
         </div>
       `;
       grid.appendChild(card);
-    });
 
-    // Re-observe new reveal elements
-    document.querySelectorAll('.rank-tier.reveal:not(.visible)').forEach(el => observer.observe(el));
+      // Observe new reveal cards
+      observer.observe(card);
+    });
   }
 
   // ---- REGISTRY (Supabase) ----
