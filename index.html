@@ -2088,14 +2088,25 @@
   const PASSWORD = 'tsunayoshi';
   let editMode = false;
 
-  // Load from localStorage
-  let fameData = JSON.parse(localStorage.getItem('reborn_fame') || '[]');
-  let shameData = JSON.parse(localStorage.getItem('reborn_shame') || '[]');
-  let overallData = JSON.parse(localStorage.getItem('reborn_overall') || '[]');
+  let fameData = [];
+  let shameData = [];
+  let overallData = [];
 
-  renderBoard('fame');
-  renderBoard('shame');
-  renderOverall();
+  async function loadAllBoards() {
+    const [fame, shame, overall] = await Promise.all([
+      sbFetch('/rest/v1/leaderboard?type=eq.fame&select=id,name,score&order=score.desc'),
+      sbFetch('/rest/v1/leaderboard?type=eq.shame&select=id,name,score&order=score.desc'),
+      sbFetch('/rest/v1/overall_standings?select=id,name,wins,draws,losses')
+    ]);
+    fameData  = fame    || [];
+    shameData = shame   || [];
+    overallData = overall || [];
+    renderBoard('fame');
+    renderBoard('shame');
+    renderOverall();
+  }
+
+  loadAllBoards();
 
   function togglePasswordRow() {
     const row = document.getElementById('passwordRow');
@@ -2206,14 +2217,9 @@
 
   function addRow(type) {
     const data = type === 'fame' ? fameData : shameData;
-    if (data.length >= 3) {
-      alert('Maximum 3 entries per board. Remove one to add a new member.');
-      return;
-    }
-    const newEntry = { id: Date.now().toString(), name: 'New Member', score: 0 };
+    if (data.length >= 3) { alert('Maximum 3 entries per board. Remove one to add a new member.'); return; }
+    const newEntry = { id: Date.now().toString(), type, name: 'New Member', score: 0 };
     data.push(newEntry);
-    if (type === 'fame') fameData = data;
-    else shameData = data;
     renderBoard(type);
   }
 
@@ -2229,18 +2235,25 @@
     renderBoard(type);
   }
 
-  function saveBoard(type) {
+  async function saveBoard(type) {
     const data = type === 'fame' ? fameData : shameData;
-    localStorage.setItem('reborn_' + type, JSON.stringify(data));
     const bar = document.getElementById(type + 'SaveBar');
     const btn = bar.querySelector('.lb-save-btn');
+    btn.textContent = 'Saving...';
+
+    // Delete all existing rows of this type then re-insert
+    await sbFetch(`/rest/v1/leaderboard?type=eq.${type}`, { method: 'DELETE' });
+    if (data.length > 0) {
+      await sbFetch('/rest/v1/leaderboard', {
+        method: 'POST',
+        prefer: 'return=minimal',
+        body: JSON.stringify(data.map(e => ({ id: e.id, type, name: e.name, score: e.score })))
+      });
+    }
+
     btn.textContent = '✓ Saved';
     btn.style.background = '#2a6e2a';
-    setTimeout(() => {
-      btn.textContent = 'Save Changes';
-      btn.style.background = '';
-      renderBoard(type);
-    }, 1500);
+    setTimeout(() => { btn.textContent = 'Save Changes'; btn.style.background = ''; loadAllBoards(); }, 1500);
   }
 
   function addOverallRow() {
@@ -2259,17 +2272,24 @@
     renderOverall();
   }
 
-  function saveOverall() {
-    localStorage.setItem('reborn_overall', JSON.stringify(overallData));
+  async function saveOverall() {
     const bar = document.getElementById('overallSaveBar');
-    const btn = bar.querySelector('.lb-save-btn');
+    const btn = bar.querySelector('.lb-save-btn:last-child');
+    btn.textContent = 'Saving...';
+
+    // Delete all then re-insert
+    await sbFetch('/rest/v1/overall_standings?id=neq.null', { method: 'DELETE' });
+    if (overallData.length > 0) {
+      await sbFetch('/rest/v1/overall_standings', {
+        method: 'POST',
+        prefer: 'return=minimal',
+        body: JSON.stringify(overallData.map(e => ({ id: e.id, name: e.name, wins: e.wins || 0, draws: e.draws || 0, losses: e.losses || 0 })))
+      });
+    }
+
     btn.textContent = '✓ Saved';
     btn.style.background = '#2a6e2a';
-    setTimeout(() => {
-      btn.textContent = 'Save Changes';
-      btn.style.background = '';
-      renderOverall();
-    }, 1500);
+    setTimeout(() => { btn.textContent = 'Save Changes'; btn.style.background = ''; loadAllBoards(); }, 1500);
   }
 
   function renderOverall() {
