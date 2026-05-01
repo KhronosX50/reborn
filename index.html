@@ -150,7 +150,6 @@
       var(--deep-navy);
   }
 
-  /* Animated flame particles */
   .flames {
     position: absolute;
     bottom: 0; left: 50%;
@@ -321,7 +320,6 @@
     color: var(--muted);
   }
 
-  /* SECTION BASE */
   section { padding: 7rem 3rem; }
 
   .section-label {
@@ -361,7 +359,6 @@
     line-height: 1.7;
   }
 
-  /* DIVIDER */
   .flame-divider {
     width: 100%;
     height: 1px;
@@ -370,7 +367,6 @@
     opacity: 0.3;
   }
 
-  /* ABOUT */
   #about {
     max-width: 1200px;
     margin: 0 auto;
@@ -380,9 +376,7 @@
     align-items: center;
   }
 
-  .about-visual {
-    position: relative;
-  }
+  .about-visual { position: relative; }
 
   .about-badge {
     width: 100%;
@@ -426,18 +420,13 @@
     z-index: 2;
   }
 
-  .badge-icon {
-    font-size: 3rem;
-  }
-
+  .badge-icon { font-size: 3rem; }
   .badge-text {
     font-family: 'Bebas Neue', sans-serif;
     font-size: 0.85rem;
     letter-spacing: 0.3em;
     color: var(--flame-bright);
   }
-
-  .about-content { }
 
   .about-stats {
     display: grid;
@@ -447,8 +436,6 @@
     padding-top: 2.5rem;
     border-top: 1px solid var(--border);
   }
-
-  .stat-item { }
 
   .stat-number {
     font-family: 'Bebas Neue', sans-serif;
@@ -467,16 +454,11 @@
     margin-top: 0.25rem;
   }
 
-  /* EVENTS */
   #events {
     background: linear-gradient(180deg, var(--deep-navy), var(--dark-surface), var(--deep-navy));
   }
 
-  .events-inner {
-    max-width: 1200px;
-    margin: 0 auto;
-  }
-
+  .events-inner { max-width: 1200px; margin: 0 auto; }
   .events-header {
     display: flex;
     justify-content: space-between;
@@ -568,16 +550,8 @@
     font-weight: 600;
   }
 
-  /* MEMBERS */
-  #members {
-    max-width: 1200px;
-    margin: 0 auto;
-  }
-
-  .members-header {
-    margin-bottom: 3.5rem;
-  }
-
+  #members { max-width: 1200px; margin: 0 auto; }
+  .members-header { margin-bottom: 3.5rem; }
   .members-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -663,16 +637,8 @@
     z-index: 1;
   }
 
-  /* RESOURCES */
-  #resources {
-    background: linear-gradient(180deg, var(--deep-navy), var(--dark-surface));
-  }
-
-  .resources-inner {
-    max-width: 1200px;
-    margin: 0 auto;
-  }
-
+  #resources { background: linear-gradient(180deg, var(--deep-navy), var(--dark-surface)); }
+  .resources-inner { max-width: 1200px; margin: 0 auto; }
   .resources-header {
     display: flex;
     justify-content: space-between;
@@ -697,7 +663,6 @@
   }
 
   .resource-featured:hover { border-color: rgba(255,107,0,0.5); }
-
   .resource-featured-bg {
     position: absolute;
     top: -50px; right: -50px;
@@ -792,7 +757,6 @@
     letter-spacing: 0.1em;
   }
 
-  /* JOIN CTA */
   #join {
     text-align: center;
     position: relative;
@@ -832,7 +796,6 @@
     line-height: 1.7;
   }
 
-  /* FOOTER */
   footer {
     background: var(--black);
     padding: 2.5rem 3rem;
@@ -874,7 +837,6 @@
 
   .footer-links a:hover { color: var(--flame-orange); }
 
-  /* ANIMATIONS */
   @keyframes fadeUp {
     from { opacity: 0; transform: translateY(24px); }
     to { opacity: 1; transform: translateY(0); }
@@ -891,16 +853,11 @@
     transform: translateY(0);
   }
 
-  /* LEADERBOARD */
   #leaderboard {
     background: linear-gradient(180deg, var(--dark-surface), var(--deep-navy));
   }
 
-  .leaderboard-inner {
-    max-width: 1200px;
-    margin: 0 auto;
-  }
-
+  .leaderboard-inner { max-width: 1200px; margin: 0 auto; }
   .leaderboard-header {
     display: flex;
     justify-content: space-between;
@@ -1149,7 +1106,6 @@
 
   .lb-save-btn:hover { filter: brightness(1.15); }
 
-  /* RESPONSIVE */
   @media (max-width: 768px) {
     nav { padding: 1rem 1.5rem; }
     .nav-links { display: none; }
@@ -1161,24 +1117,15 @@
     footer { flex-direction: column; gap: 1.5rem; text-align: center; }
     .leaderboard-grid { grid-template-columns: 1fr; }
   }
-  /* REGISTRY */
-  #registry {
-    background: var(--deep-navy);
-  }
 
-  .registry-inner {
-    max-width: 1200px;
-    margin: 0 auto;
-  }
-
+  #registry { background: var(--deep-navy); }
+  .registry-inner { max-width: 1200px; margin: 0 auto; }
   .registry-layout {
     display: grid;
     grid-template-columns: 1fr 1.4fr;
     gap: 4rem;
     align-items: start;
   }
-
-  .registry-info { }
 
   .registry-status-box {
     margin-top: 2rem;
@@ -1203,9 +1150,7 @@
     animation: dotPulse 1.5s ease-in-out infinite;
   }
 
-  .reg-status-dot.closed {
-    background: #555;
-  }
+  .reg-status-dot.closed { background: #555; }
 
   @keyframes dotPulse {
     0%, 100% { opacity: 1; }
@@ -1298,9 +1243,6 @@
   }
 
   .reg-clear-btn:hover { border-color: var(--muted); color: var(--text); }
-
-  /* FORM SIDE */
-  .registry-form-area { }
 
   .reg-closed-banner {
     display: none;
@@ -1406,7 +1348,6 @@
 
   .reg-success.show { display: block; }
 
-  /* REGISTRANTS LIST */
   .reg-list-panel {
     display: none;
     margin-top: 2.5rem;
@@ -1472,7 +1413,6 @@
 </head>
 <body>
 
-<!-- NAV -->
 <nav>
   <a href="#hero" class="nav-logo">
     REBORN!
@@ -1490,28 +1430,21 @@
   </ul>
 </nav>
 
-<!-- HERO -->
 <section id="hero">
   <div class="hero-bg"></div>
-
   <div class="flames" aria-hidden="true" id="flamesContainer"></div>
-
   <div class="hero-eyebrow">🔥 Where Words Combust</div>
-
   <h1 class="hero-title">
     <span class="line1">REBORN</span>
     <span class="line2">DEBATE!</span>
   </h1>
-
   <p class="hero-sub">
     A community for those who argue with <strong>precision</strong>, read with <strong>obsession</strong>, and debate with the conviction of someone who's already died twice.
   </p>
-
   <div class="hero-buttons">
     <a href="#join" class="btn-primary">Join the Family</a>
     <a href="#events" class="btn-secondary">View Events</a>
   </div>
-
   <div class="hero-scroll">
     <span class="scroll-text">Scroll</span>
     <div class="scroll-line"></div>
@@ -1520,7 +1453,6 @@
 
 <div class="flame-divider"></div>
 
-<!-- ABOUT -->
 <section>
   <div id="about">
     <div class="about-visual reveal">
@@ -1563,7 +1495,6 @@
 
 <div class="flame-divider"></div>
 
-<!-- EVENTS -->
 <section id="events">
   <div class="events-inner">
     <div class="events-header reveal">
@@ -1573,7 +1504,6 @@
       </div>
       <a href="#" class="resource-link">All Events</a>
     </div>
-
     <div class="events-grid" style="grid-template-columns: 1fr;">
       <div class="event-card reveal" style="max-width: 500px;">
         <span class="event-type type-open">Weekly Debate</span>
@@ -1590,7 +1520,6 @@
 
 <div class="flame-divider"></div>
 
-<!-- MEMBERS -->
 <section>
   <div id="members">
     <div class="members-header reveal">
@@ -1598,7 +1527,6 @@
       <h2 class="section-title">Our Core Members</h2>
       <p class="section-desc">Every strong argument needs a stronger opponent.</p>
     </div>
-
     <div class="members-grid">
       <div class="member-card reveal">
         <div class="member-avatar">T</div>
@@ -1607,7 +1535,6 @@
         <p class="member-specialty">The Beginning & The End</p>
         <div class="member-flame"></div>
       </div>
-
       <div class="member-card reveal">
         <div class="member-avatar" style="background: linear-gradient(135deg, #FFD000, #0A0A0A);">M</div>
         <p class="member-role">Moderator</p>
@@ -1615,7 +1542,6 @@
         <p class="member-specialty">Order & Precision</p>
         <div class="member-flame"></div>
       </div>
-
       <div class="member-card reveal">
         <div class="member-avatar" style="background: linear-gradient(135deg, #FF4500, #141824);">J</div>
         <p class="member-role">Moderator</p>
@@ -1623,7 +1549,6 @@
         <p class="member-specialty">Structure & Balance</p>
         <div class="member-flame"></div>
       </div>
-
       <div class="member-card reveal">
         <div class="member-avatar" style="background: linear-gradient(135deg, #FF9A00, #080C1A);">N</div>
         <p class="member-role">Senior Debater</p>
@@ -1631,7 +1556,6 @@
         <p class="member-specialty">Argument & Analysis</p>
         <div class="member-flame"></div>
       </div>
-
       <div class="member-card reveal">
         <div class="member-avatar" style="background: linear-gradient(135deg, #FF6B00, #10141F);">A</div>
         <p class="member-role">Wildcard</p>
@@ -1639,15 +1563,12 @@
         <p class="member-specialty">The Unpredictable</p>
         <div class="member-flame"></div>
       </div>
-
-
     </div>
   </div>
 </section>
 
 <div class="flame-divider"></div>
 
-<!-- RESOURCES -->
 <section id="resources">
   <div class="resources-inner">
     <div class="resources-header reveal">
@@ -1657,7 +1578,6 @@
       </div>
       <a href="#" class="resource-link">Full Library</a>
     </div>
-
     <div class="resources-grid">
       <div class="resource-featured reveal">
         <div class="resource-featured-bg"></div>
@@ -1668,7 +1588,6 @@
         </p>
         <a href="#" class="resource-link">Read Article</a>
       </div>
-
       <div class="resources-list">
         <div class="resource-item reveal">
           <span class="resource-num">01</span>
@@ -1705,22 +1624,16 @@
 
 <div class="flame-divider"></div>
 
-<!-- RULES OF ENGAGEMENT -->
 <section id="rules">
   <div style="max-width:900px;margin:0 auto;">
-
     <div class="reveal" style="margin-bottom:3rem;">
       <p class="section-label">Format</p>
       <h2 class="section-title">Rules of Engagement</h2>
       <p class="section-desc">The official Reborn! debate format. Read before you step into the arena.</p>
     </div>
-
-    <!-- DEBATE STRUCTURE -->
     <div class="reveal" style="margin-bottom:3rem;">
       <p style="font-size:0.7rem;letter-spacing:0.4em;text-transform:uppercase;color:var(--flame-orange);font-weight:700;margin-bottom:1.5rem;">I. Debate Structure</p>
-
       <div style="display:flex;flex-direction:column;gap:1rem;">
-
         <div style="background:var(--card-bg);border:1px solid var(--border);padding:1.5rem 2rem;display:grid;grid-template-columns:2rem 1fr;gap:1.25rem;align-items:start;position:relative;overflow:hidden;">
           <div style="position:absolute;top:0;left:0;width:3px;height:100%;background:linear-gradient(to bottom,var(--flame-orange),var(--flame-core));"></div>
           <span style="font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:var(--flame-core);line-height:1;">1</span>
@@ -1729,7 +1642,6 @@
             <p style="font-family:'Crimson Pro',serif;font-size:0.95rem;color:var(--muted);line-height:1.6;">Debater A opens by stating their Win Condition — the specific argument, feat, or ability they believe secures victory for their character or position. This must be grounded in canon evidence.</p>
           </div>
         </div>
-
         <div style="background:var(--card-bg);border:1px solid var(--border);padding:1.5rem 2rem;display:grid;grid-template-columns:2rem 1fr;gap:1.25rem;align-items:start;position:relative;overflow:hidden;">
           <div style="position:absolute;top:0;left:0;width:3px;height:100%;background:linear-gradient(to bottom,var(--flame-orange),var(--flame-core));"></div>
           <span style="font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:var(--flame-core);line-height:1;">2</span>
@@ -1738,7 +1650,6 @@
             <p style="font-family:'Crimson Pro',serif;font-size:0.95rem;color:var(--muted);line-height:1.6;">Debater B responds with two things in one move: a <strong style="color:var(--text);">Resistance</strong> that neutralises A's Win Condition, and a <strong style="color:var(--text);">Counter</strong> — which simultaneously serves as B's own Win Condition. Both must be supported with evidence.</p>
           </div>
         </div>
-
         <div style="background:var(--card-bg);border:1px solid var(--border);padding:1.5rem 2rem;display:grid;grid-template-columns:2rem 1fr;gap:1.25rem;align-items:start;position:relative;overflow:hidden;">
           <div style="position:absolute;top:0;left:0;width:3px;height:100%;background:linear-gradient(to bottom,var(--flame-orange),var(--flame-core));"></div>
           <span style="font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:var(--flame-core);line-height:1;">3</span>
@@ -1747,7 +1658,6 @@
             <p style="font-family:'Crimson Pro',serif;font-size:0.95rem;color:var(--muted);line-height:1.6;">Debater A responds to B's Counter/Win Condition with their own Resistance. This is A's final move. A must demonstrate why B's Win Condition does not hold against their character or argument.</p>
           </div>
         </div>
-
         <div style="background:rgba(255,107,0,0.04);border:1px solid rgba(255,107,0,0.35);padding:1.5rem 2rem;display:grid;grid-template-columns:2rem 1fr;gap:1.25rem;align-items:start;position:relative;overflow:hidden;">
           <div style="position:absolute;top:0;left:0;width:3px;height:100%;background:var(--flame-core);"></div>
           <span style="font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:var(--flame-core);line-height:1;">⚖</span>
@@ -1756,52 +1666,39 @@
             <p style="font-family:'Crimson Pro',serif;font-size:0.95rem;color:var(--muted);line-height:1.6;">Judges evaluate both Win Conditions and all evidence presented. The verdict is based on the strength, consistency, and canon validity of each debater's arguments. The judge's decision is final.</p>
           </div>
         </div>
-
       </div>
     </div>
-
-    <!-- TIME LIMIT -->
     <div class="reveal" style="margin-bottom:3rem;">
       <p style="font-size:0.7rem;letter-spacing:0.4em;text-transform:uppercase;color:var(--flame-orange);font-weight:700;margin-bottom:1.5rem;">II. Time Limit</p>
       <div style="background:var(--card-bg);border:1px solid var(--border);padding:1.5rem 2rem;">
         <p style="font-family:'Crimson Pro',serif;font-size:1rem;color:var(--muted);line-height:1.8;">Each debater has <strong style="color:var(--flame-bright);">24 hours</strong> to post their argument from the moment it is their turn. Failure to respond within 24 hours results in an automatic forfeit of that round. Extensions may be granted at the admin's discretion under exceptional circumstances.</p>
       </div>
     </div>
-
-    <!-- EVIDENCE RULES -->
     <div class="reveal" style="margin-bottom:3rem;">
       <p style="font-size:0.7rem;letter-spacing:0.4em;text-transform:uppercase;color:var(--flame-orange);font-weight:700;margin-bottom:1.5rem;">III. Evidence & Validity Rules</p>
       <div style="background:var(--card-bg);border:1px solid var(--border);padding:1.5rem 2rem;display:flex;flex-direction:column;gap:1rem;">
-
         <div style="display:flex;gap:1rem;align-items:start;">
           <span style="color:var(--flame-orange);font-weight:700;flex-shrink:0;">✓</span>
           <p style="font-family:'Crimson Pro',serif;font-size:0.95rem;color:var(--muted);line-height:1.6;"><strong style="color:var(--text);">Canon sources only.</strong> All evidence must come from primary canon — manga, anime, light novels, databooks, or official statements from authors/creators. Fan wikis are not primary sources and cannot be cited as standalone evidence.</p>
         </div>
-
         <div style="display:flex;gap:1rem;align-items:start;">
           <span style="color:var(--flame-orange);font-weight:700;flex-shrink:0;">✓</span>
           <p style="font-family:'Crimson Pro',serif;font-size:0.95rem;color:var(--muted);line-height:1.6;"><strong style="color:var(--text);">No outlier feats.</strong> A feat is considered an outlier if it is a significant, unexplained anomaly that contradicts the character's consistent performance throughout the series. Outlier feats may not be used as a primary basis for a Win Condition.</p>
         </div>
-
         <div style="display:flex;gap:1rem;align-items:start;">
           <span style="color:var(--flame-orange);font-weight:700;flex-shrink:0;">✓</span>
           <p style="font-family:'Crimson Pro',serif;font-size:0.95rem;color:var(--muted);line-height:1.6;"><strong style="color:var(--text);">No wanking or lowballing.</strong> Arguments must represent a character's honest, consistent capabilities. Deliberately overstating or understating a character's abilities to win an argument is grounds for disqualification by the judges.</p>
         </div>
-
         <div style="display:flex;gap:1rem;align-items:start;">
           <span style="color:var(--flame-orange);font-weight:700;flex-shrink:0;">✓</span>
           <p style="font-family:'Crimson Pro',serif;font-size:0.95rem;color:var(--muted);line-height:1.6;"><strong style="color:var(--text);">Scaling must be logical and traceable.</strong> If you scale a character through another, each step of the scaling chain must be supported by explicit or strongly implied canon evidence. Vague or speculative scaling chains are invalid.</p>
         </div>
-
         <div style="display:flex;gap:1rem;align-items:start;">
           <span style="color:var(--flame-orange);font-weight:700;flex-shrink:0;">✓</span>
           <p style="font-family:'Crimson Pro',serif;font-size:0.95rem;color:var(--muted);line-height:1.6;"><strong style="color:var(--text);">Statements vs. feats.</strong> Demonstrated feats take priority over character statements. Author statements are admissible but may be challenged if they contradict in-universe evidence.</p>
         </div>
-
       </div>
     </div>
-
-    <!-- CONDUCT -->
     <div class="reveal">
       <p style="font-size:0.7rem;letter-spacing:0.4em;text-transform:uppercase;color:var(--flame-orange);font-weight:700;margin-bottom:1.5rem;">IV. Conduct</p>
       <div style="background:var(--card-bg);border:1px solid var(--border);padding:1.5rem 2rem;display:flex;flex-direction:column;gap:1rem;">
@@ -1819,41 +1716,32 @@
         </div>
       </div>
     </div>
-
   </div>
 </section>
 
 <div class="flame-divider"></div>
 
-<!-- REGISTRY -->
 <section id="registry">
   <div class="registry-inner">
     <div class="registry-header reveal" style="margin-bottom:3rem;">
       <p class="section-label">Event Slots</p>
       <h2 class="section-title">Register for Events</h2>
-      <p class="section-desc">Special events are announced by the admin. When slots open, register here with your name and WhatsApp number to secure your place.</p>
+      p class="section-desc">Special events are announced by the admin. When slots open, register here with your name and WhatsApp number to secure your place.</p>
     </div>
-
     <div class="registry-layout">
-
-      <!-- LEFT: STATUS + ADMIN -->
       <div class="registry-info reveal">
         <div id="regStatusBox" class="registry-status-box">
           <div class="reg-status-dot closed" id="regDot"></div>
           <span class="reg-status-text closed" id="regStatusText">Registration Closed</span>
         </div>
-
-        <!-- Admin unlock -->
         <div style="margin-top:1.5rem;">
           <button class="lb-unlock-btn" id="regUnlockBtn" onclick="toggleRegPassword()">⚙ Admin Panel</button>
         </div>
-
         <div class="lb-password-row" id="regPasswordRow">
           <input type="password" class="lb-password-input" id="regPasswordInput" placeholder="Enter password..." onkeydown="if(event.key==='Enter') submitRegPassword()" />
           <button class="lb-password-submit" onclick="submitRegPassword()">Unlock</button>
           <span class="lb-error" id="regPwError"></span>
         </div>
-
         <div class="reg-admin-panel" id="regAdminPanel">
           <p style="font-size:0.7rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted);font-weight:700;">Event Name / Topic</p>
           <input type="text" class="reg-topic-input" id="regTopicInput" placeholder="e.g. Fiction Debate — Round 1" />
@@ -1863,8 +1751,6 @@
             <button class="reg-clear-btn" onclick="clearRegistrants()">Clear List</button>
           </div>
         </div>
-
-        <!-- Registrants list (admin only) -->
         <div class="reg-list-panel" id="regListPanel">
           <p class="reg-list-title">
             Registrants
@@ -1873,33 +1759,25 @@
           <div class="reg-list" id="regList"></div>
         </div>
       </div>
-
-      <!-- RIGHT: FORM OR CLOSED BANNER -->
       <div class="registry-form-area reveal">
-
         <div class="reg-closed-banner show" id="regClosedBanner">
           <div class="reg-closed-icon">🔒</div>
           <p class="reg-closed-title">No Ongoing Event</p>
           <p class="reg-closed-sub">Stay tuned. The admin will open slots when a new event is announced.</p>
         </div>
-
         <div class="reg-form" id="regForm">
           <div class="reg-topic-display" id="regTopicDisplay">This week's topic will be announced shortly.</div>
-
           <div class="reg-field">
             <label class="reg-label" for="regName">Your Name</label>
             <input type="text" class="reg-input" id="regName" placeholder="What do they call you?" maxlength="60" />
           </div>
-
           <div class="reg-field">
             <label class="reg-label" for="regPhone">WhatsApp Number</label>
             <input type="text" class="reg-input" id="regPhone" placeholder="e.g. 08012345678" maxlength="20" />
           </div>
-
           <button class="reg-submit" onclick="submitRegistration()">Secure My Spot 🔥</button>
           <div class="reg-success" id="regSuccess">✓ You're registered! See you in the debate.</div>
         </div>
-
       </div>
     </div>
   </div>
@@ -1907,7 +1785,6 @@
 
 <div class="flame-divider"></div>
 
-<!-- LEADERBOARD -->
 <section id="leaderboard">
   <div class="leaderboard-inner">
     <div class="leaderboard-header reveal">
@@ -1918,16 +1795,12 @@
       </div>
       <button class="lb-unlock-btn" id="unlockBtn" onclick="togglePasswordRow()">⚙ Edit Mode</button>
     </div>
-
     <div class="lb-password-row" id="passwordRow">
       <input type="password" class="lb-password-input" id="passwordInput" placeholder="Enter password..." onkeydown="if(event.key==='Enter') submitPassword()" />
       <button class="lb-password-submit" onclick="submitPassword()">Unlock</button>
       <span class="lb-error" id="pwError"></span>
     </div>
-
     <div class="leaderboard-grid">
-
-      <!-- HALL OF FAME -->
       <div class="lb-board reveal">
         <div class="lb-board-header">
           <span class="lb-board-title fame">Hall of Fame</span>
@@ -1953,8 +1826,6 @@
           <button class="lb-save-btn" onclick="saveBoard('fame')">Save Changes</button>
         </div>
       </div>
-
-      <!-- HALL OF SHAME -->
       <div class="lb-board reveal">
         <div class="lb-board-header">
           <span class="lb-board-title shame">Hall of Shame</span>
@@ -1980,10 +1851,7 @@
           <button class="lb-save-btn" onclick="saveBoard('shame')">Save Changes</button>
         </div>
       </div>
-
-    </div><!-- end leaderboard-grid -->
-
-    <!-- OVERALL LEADERBOARD -->
+    </div>
     <div style="margin-top:3rem;" class="reveal">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem;">
         <div>
@@ -1998,7 +1866,6 @@
         </div>
         <button class="lb-add-btn" id="addOverallBtn" onclick="addOverallRow()" style="display:none;">+ Add Member</button>
       </div>
-
       <div class="lb-board">
         <div style="overflow-x:auto;">
         <table class="lb-table" style="width:100%;min-width:600px;">
@@ -2024,9 +1891,9 @@
         </div>
       </div>
     </div>
-
   </div>
 </section>
+
 <section id="join">
   <div class="join-bg"></div>
   <div class="join-inner reveal">
@@ -2041,7 +1908,6 @@
   </div>
 </section>
 
-<!-- FOOTER -->
 <footer>
   <span class="footer-logo">REBORN!</span>
   <p class="footer-text">© 2025 Reborn! Debate Community</p>
@@ -2053,7 +1919,31 @@
 </footer>
 
 <script>
-  // Flame particles
+  // ===== SUPABASE SETUP — MUST BE FIRST =====
+  const SB_URL = 'https://jmatpwiipqwwgvusirtt.supabase.co';
+  const SB_KEY = 'sb_publishable_-6uh2nFv9DwIRss_yce7PA_MbSHCR7n';
+
+  async function sbFetch(path, options = {}) {
+    const headers = {
+      'apikey': SB_KEY,
+      'Content-Type': 'application/json',
+      'Prefer': options.prefer || '',
+      ...(options.headers || {})
+    };
+    if (SB_KEY.startsWith('eyJ')) {
+      headers['Authorization'] = 'Bearer ' + SB_KEY;
+    }
+    const res = await fetch(SB_URL + path, { ...options, headers });
+    if (!res.ok && res.status !== 204) {
+      const err = await res.text();
+      console.error('Supabase error (' + res.status + '):', err);
+      throw new Error('Supabase request failed: ' + res.status);
+    }
+    if (res.status === 204) return [];
+    return res.json();
+  }
+
+  // ===== FLAME PARTICLES =====
   const flamesContainer = document.getElementById('flamesContainer');
   const flameColors = ['#FF6B00','#FF9A00','#FFD000','#FF4500'];
   for (let i = 0; i < 18; i++) {
@@ -2073,53 +1963,49 @@
       }
     });
   }, { threshold: 0.1 });
-
   document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
   // Nav scroll effect
-  const nav = document.querySelector('nav');
+  const navEl = document.querySelector('nav');
   window.addEventListener('scroll', () => {
-    nav.style.borderBottomColor = window.scrollY > 50
+    navEl.style.borderBottomColor = window.scrollY > 50
       ? 'rgba(255,107,0,0.35)'
       : 'rgba(255,107,0,0.15)';
   });
 
-  // ---- LEADERBOARD ----
+  // ===== LEADERBOARD =====
   const PASSWORD = 'tsunayoshi';
   let editMode = false;
-
   let fameData = [];
   let shameData = [];
   let overallData = [];
 
   async function loadAllBoards() {
-    const [fame, shame, overall] = await Promise.all([
-      sbFetch('/rest/v1/leaderboard?type=eq.fame&select=id,name,score&order=score.desc'),
-      sbFetch('/rest/v1/leaderboard?type=eq.shame&select=id,name,score&order=score.desc'),
-      sbFetch('/rest/v1/overall_standings?select=id,name,wins,draws,losses')
-    ]);
-    fameData  = fame    || [];
-    shameData = shame   || [];
-    overallData = overall || [];
+    try {
+      const [fame, shame, overall] = await Promise.all([
+        sbFetch('/rest/v1/leaderboard?type=eq.fame&select=id,name,score&order=score.desc'),
+        sbFetch('/rest/v1/leaderboard?type=eq.shame&select=id,name,score&order=score.desc'),
+        sbFetch('/rest/v1/overall_standings?select=id,name,wins,draws,losses')
+      ]);
+      fameData = fame || [];
+      shameData = shame || [];
+      overallData = overall || [];
+    } catch (e) {
+      console.error('Failed to load boards:', e);
+      fameData = []; shameData = []; overallData = [];
+    }
     renderBoard('fame');
     renderBoard('shame');
     renderOverall();
   }
 
-  loadAllBoards();
-
   function togglePasswordRow() {
     const row = document.getElementById('passwordRow');
     const btn = document.getElementById('unlockBtn');
-    if (editMode) {
-      exitEditMode();
-      return;
-    }
+    if (editMode) { exitEditMode(); return; }
     row.classList.toggle('visible');
     btn.classList.toggle('active');
-    if (row.classList.contains('visible')) {
-      document.getElementById('passwordInput').focus();
-    }
+    if (row.classList.contains('visible')) document.getElementById('passwordInput').focus();
   }
 
   function submitPassword() {
@@ -2173,12 +2059,7 @@
   function renderBoard(type) {
     const data = type === 'fame' ? fameData : shameData;
     const tbody = document.getElementById(type + 'Body');
-    const emptyId = type + 'Empty';
-    const scoreClass = type === 'fame' ? 'fame-score' : 'shame-score';
-    const colLabel = type === 'fame' ? 'Wins' : 'Losses';
-
     tbody.innerHTML = '';
-
     if (data.length === 0) {
       const msg = type === 'fame'
         ? 'No winners yet. The flame hasn\'t chosen.'
@@ -2186,31 +2067,26 @@
       tbody.innerHTML = `<tr><td colspan="4" class="lb-empty">${msg}</td></tr>`;
       return;
     }
-
-    // Sort descending
     const sorted = [...data].sort((a, b) => b.score - a.score);
-
     sorted.forEach((entry, i) => {
       const rank = i + 1;
       const tr = document.createElement('tr');
       tr.className = 'lb-row';
       tr.dataset.id = entry.id;
-
       if (editMode) {
         tr.innerHTML = `
           <td class="lb-rank${rank === 1 ? ' top' : ''}">${rank}</td>
           <td class="lb-name"><input class="lb-name-input" value="${entry.name}" onchange="updateEntry('${type}', '${entry.id}', 'name', this.value)" /></td>
-          <td class="lb-score ${scoreClass}"><input class="lb-score-input ${scoreClass}" type="number" min="0" value="${entry.score}" onchange="updateEntry('${type}', '${entry.id}', 'score', parseInt(this.value)||0)" /></td>
+          <td class="lb-score ${type === 'fame' ? 'fame-score' : 'shame-score'}"><input class="lb-score-input ${type === 'fame' ? 'fame-score' : 'shame-score'}" type="number" min="0" value="${entry.score}" onchange="updateEntry('${type}', '${entry.id}', 'score', parseInt(this.value)||0)" /></td>
           <td class="lb-delete-btn show" onclick="deleteEntry('${type}', '${entry.id}')">✕</td>
         `;
       } else {
         tr.innerHTML = `
           <td class="lb-rank${rank === 1 ? ' top' : ''}">${rank}</td>
           <td class="lb-name">${entry.name}</td>
-          <td class="lb-score ${scoreClass}">${entry.score}</td>
+          <td class="lb-score ${type === 'fame' ? 'fame-score' : 'shame-score'}">${entry.score}</td>
         `;
       }
-
       tbody.appendChild(tr);
     });
   }
@@ -2218,7 +2094,7 @@
   function addRow(type) {
     const data = type === 'fame' ? fameData : shameData;
     if (data.length >= 3) { alert('Maximum 3 entries per board. Remove one to add a new member.'); return; }
-    const newEntry = { id: Date.now().toString(), type, name: 'New Member', score: 0 };
+    const newEntry = { id: crypto.randomUUID(), type, name: 'New Member', score: 0 };
     data.push(newEntry);
     renderBoard(type);
   }
@@ -2240,24 +2116,33 @@
     const bar = document.getElementById(type + 'SaveBar');
     const btn = bar.querySelector('.lb-save-btn');
     btn.textContent = 'Saving...';
-
-    // Delete all existing rows of this type then re-insert
-    await sbFetch(`/rest/v1/leaderboard?type=eq.${type}`, { method: 'DELETE' });
-    if (data.length > 0) {
-      await sbFetch('/rest/v1/leaderboard', {
-        method: 'POST',
-        prefer: 'return=minimal',
-        body: JSON.stringify(data.map(e => ({ id: e.id, type, name: e.name, score: e.score })))
-      });
+    try {
+      await sbFetch(`/rest/v1/leaderboard?type=eq.${type}`, { method: 'DELETE' });
+      if (data.length > 0) {
+        await sbFetch('/rest/v1/leaderboard', {
+          method: 'POST',
+          prefer: 'return=minimal',
+          body: JSON.stringify(data.map(e => ({ id: e.id, type, name: e.name, score: e.score })))
+        });
+      })))
+        });
+      }
+      btn.textContent = '✓ Saved';
+      btn.style.background = '#2a6e2a';
+    } catch (e) {
+      console.error('Save failed:', e);
+      btn.textContent = '✗ Error';
+      btn.style.background = '#8B0000';
     }
-
-    btn.textContent = '✓ Saved';
-    btn.style.background = '#2a6e2a';
-    setTimeout(() => { btn.textContent = 'Save Changes'; btn.style.background = ''; loadAllBoards(); }, 1500);
+    setTimeout(() => {
+      btn.textContent = 'Save Changes';
+      btn.style.background = '';
+      loadAllBoards();
+    }, 1500);
   }
 
   function addOverallRow() {
-    const newEntry = { id: Date.now().toString(), name: 'New Member', wins: 0, draws: 0, losses: 0 };
+    const newEntry = { id: crypto.randomUUID(), name: 'New Member', wins: 0, draws: 0, losses: 0 };
     overallData.push(newEntry);
     renderOverall();
   }
@@ -2276,44 +2161,47 @@
     const bar = document.getElementById('overallSaveBar');
     const btn = bar.querySelector('.lb-save-btn:last-child');
     btn.textContent = 'Saving...';
-
-    // Delete all then re-insert
-    await sbFetch('/rest/v1/overall_standings?id=neq.null', { method: 'DELETE' });
-    if (overallData.length > 0) {
-      await sbFetch('/rest/v1/overall_standings', {
-        method: 'POST',
-        prefer: 'return=minimal',
-        body: JSON.stringify(overallData.map(e => ({ id: e.id, name: e.name, wins: e.wins || 0, draws: e.draws || 0, losses: e.losses || 0 })))
-      });
+    try {
+      await sbFetch('/rest/v1/overall_standings?id=neq.null', { method: 'DELETE' });
+      if (overallData.length > 0) {
+        await sbFetch('/rest/v1/overall_standings', {
+          method: 'POST',
+          prefer: 'return=minimal',
+          body: JSON.stringify(overallData.map(e => ({ id: e.id, name: e.name, wins: e.wins || 0, draws: e.draws || 0, losses: e.losses || 0 })))
+        });
+      }
+      btn.textContent = '✓ Saved';
+      btn.style.background = '#2a6e2a';
+    } catch (e) {
+      console.error('Save failed:', e);
+      btn.textContent = '✗ Error';
+      btn.style.background = '#8B0000';
     }
-
-    btn.textContent = '✓ Saved';
-    btn.style.background = '#2a6e2a';
-    setTimeout(() => { btn.textContent = 'Save Changes'; btn.style.background = ''; loadAllBoards(); }, 1500);
+    setTimeout(() => {
+      btn.textContent = 'Save Changes';
+      btn.style.background = '';
+      loadAllBoards();
+    }, 1500);
   }
 
   function renderOverall() {
     const tbody = document.getElementById('overallBody');
     tbody.innerHTML = '';
-
     if (overallData.length === 0) {
       tbody.innerHTML = '<tr><td colspan="7" class="lb-empty">No records yet. The season hasn\'t begun.</td></tr>';
       return;
     }
-
     const sorted = [...overallData].sort((a, b) => {
       const pa = Math.max(0, a.wins * 10 + (a.draws || 0) * 5 - a.losses * 5);
       const pb = Math.max(0, b.wins * 10 + (b.draws || 0) * 5 - b.losses * 5);
       return pb - pa;
     });
-
     sorted.forEach((entry, i) => {
       const draws = entry.draws || 0;
       const points = Math.max(0, entry.wins * 10 + draws * 5 - entry.losses * 5);
       const rank = i + 1;
       const tr = document.createElement('tr');
       tr.className = 'lb-row';
-
       if (editMode) {
         tr.innerHTML = `
           <td class="lb-rank${rank === 1 ? ' top' : ''}">${rank}</td>
@@ -2321,7 +2209,7 @@
           <td style="text-align:center;padding:0.75rem 0.5rem;">
             <input class="lb-score-input fame-score" type="number" min="0" value="${entry.wins}" style="width:48px;text-align:center;" onchange="updateOverallEntry('${entry.id}','wins',parseInt(this.value)||0);renderOverall();" />
           </td>
-          <td style="text-align:center;padding:0.75rem 0.5rem;">
+          <td style="text-align:center;padding:0.75rem 0.55rem;">
             <input class="lb-score-input" type="number" min="0" value="${draws}" style="width:48px;text-align:center;color:var(--flame-bright);border-bottom-color:rgba(255,154,0,0.4);" onchange="updateOverallEntry('${entry.id}','draws',parseInt(this.value)||0);renderOverall();" />
           </td>
           <td style="text-align:center;padding:0.75rem 0.5rem;">
@@ -2333,7 +2221,19 @@
           </td>
         `;
       } else {
-        const pointColor = points > 0 ? 'var(--flame-core)' : points < 0 ? '#666' : 'var(--muted)';
+        tr.innerHTML = `
+          <td classrem;">
+            <input class="lb-score-input" type="number" min="0" value="${draws}" style="width:48px;text-align:center;color:var(--flame-bright);border-bottom-color:rgba(255,154,0,0.4);" onchange="updateOverallEntry('${entry.id}','draws',parseInt(this.value)||0);renderOverall();" />
+          </td>
+          <td style="text-align:center;padding:0.75rem 0.5rem;">
+            <input class="lb-score-input shame-score" type="number" min="0" value="${entry.losses}" style="width:48px;text-align:center;" onchange="updateOverallEntry('${entry.id}','losses',parseInt(this.value)||0);renderOverall();" />
+          </td>
+          <td class="lb-score ${points > 0 ? 'fame-score' : ''}" style="text-align:right;padding:0.75rem 1.75rem;">${points}</td>
+          <td style="padding:0.75rem 1rem 0.75rem 0;text-align:right;">
+            <button onclick="deleteOverallEntry('${entry.id}')" style="background:transparent;border:none;color:rgba(255,68,68,0.5);cursor:pointer;font-size:0.9rem;" onmouseover="this.style.color='#ff4444'" onmouseout="this.style.color='rgba(255,68,68,0.5)'">✕</button>
+          </td>
+        `;
+      } else {
         tr.innerHTML = `
           <td class="lb-rank${rank === 1 ? ' top' : ''}">${rank}</td>
           <td class="lb-name">${entry.name}</td>
@@ -2343,7 +2243,6 @@
           <td class="lb-score" style="text-align:right;color:${points > 0 ? 'var(--flame-core)' : 'var(--muted)'};">${points}</td>
         `;
       }
-
       tbody.appendChild(tr);
     });
   }
@@ -2351,166 +2250,74 @@
   function downloadStandings() {
     const canvas = document.createElement('canvas');
     const W = 1240, H = 1754;
-    canvas.width = W;
-    canvas.height = H;
+    canvas.width = W; canvas.height = H;
     const ctx = canvas.getContext('2d');
-
-    // Background
-    ctx.fillStyle = '#080C1A';
-    ctx.fillRect(0, 0, W, H);
-
-    // Top bar
+    ctx.fillStyle = '#080C1A'; ctx.fillRect(0, 0, W, H);
     const grad = ctx.createLinearGradient(0, 0, W, 0);
-    grad.addColorStop(0, '#FF6B00');
-    grad.addColorStop(0.4, '#FFD000');
-    grad.addColorStop(1, '#FF6B00');
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, W, 18);
-
-    // Glow
+    grad.addColorStop(0, '#FF6B00'); grad.addColorStop(0.4, '#FFD000'); grad.addColorStop(1, '#FF6B00');
+    ctx.fillStyle = grad; ctx.fillRect(0, 0, W, 18);
     const glow = ctx.createRadialGradient(W/2, H, 0, W/2, H, 700);
-    glow.addColorStop(0, 'rgba(255,107,0,0.18)');
-    glow.addColorStop(1, 'rgba(0,0,0,0)');
-    ctx.fillStyle = glow;
-    ctx.fillRect(0, 0, W, H);
-
-    // Title
-    ctx.fillStyle = '#FF6B00';
-    ctx.font = 'bold 28px "Times New Roman", Times, serif';
-    ctx.fillText('REBORN! DEBATE COMMUNITY', 80, 90);
-
-    ctx.fillStyle = '#FAFAFA';
-    ctx.font = 'bold 80px "Times New Roman", Times, serif';
-    ctx.fillText('OVERALL STANDINGS', 80, 185);
-
-    // Underline
-    ctx.fillStyle = '#FF6B00';
-    ctx.fillRect(80, 200, 500, 4);
-    ctx.fillStyle = '#FFD000';
-    ctx.fillRect(80, 200, 120, 4);
-
-    // Date
-    ctx.fillStyle = '#8A8070';
-    ctx.font = '24px "Times New Roman", Times, serif';
-    ctx.fillText('Generated: ' + new Date().toLocaleDateString('en-GB', {day:'numeric',month:'long',year:'numeric'}), 80, 250);
-
-    // Column positions — points given more room
-    const tableTop = 300;
-    const rowH = 72;
+    glow.addColorStop(0, 'rgba(255,107,0,0.18)'); glow.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = glow; ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = '#FF6B00'; ctx.font = 'bold 28px "Times New Roman", Times, serif'; ctx.fillText('REBORN! DEBATE COMMUNITY', 80, 90);
+    ctx.fillStyle = '#FAFAFA'; ctx.font = 'bold 80px "Times New Roman", Times, serif'; ctx.fillText('OVERALL STANDINGS', 80, 185);
+    ctx.fillStyle = '#FF6B00'; ctx.fillRect(80, 200, 500, 4);
+    ctx.fillStyle = '#FFD000'; ctx.fillRect(80, 200, 120, 4);
+    ctx.fillStyle = '#8A8070'; ctx.font = '24px "Times New Roman", Times, serif'; ctx.fillText('Generated: ' + new Date().toLocaleDateString('en-GB', {day:'numeric',month:'long',year:'numeric'}), 80, 250);
+    const tableTop = 300, rowH = 72;
     const cols = { rank:80, name:200, wins:700, draws:840, losses:980, points:1080 };
     const tableW = W - 120;
-
-    // Table header
-    ctx.fillStyle = '#10141F';
-    ctx.fillRect(60, tableTop, tableW, rowH);
-    ctx.fillStyle = '#FF6B00';
-    ctx.fillRect(60, tableTop, 4, rowH);
-
-    ctx.fillStyle = '#8A8070';
-    ctx.font = 'bold 22px "Times New Roman", Times, serif';
-    ctx.fillText('#', cols.rank, tableTop + 44);
-    ctx.fillText('MEMBER', cols.name, tableTop + 44);
-    ctx.fillText('W', cols.wins, tableTop + 44);
-    ctx.fillText('D', cols.draws, tableTop + 44);
+    ctx.fillStyle = '#10141F'; ctx.fillRect(60, tableTop, tableW, rowH);
+    ctx.fillStyle = '#FF6B00'; ctx.fillRect(60, tableTop, 4, rowH);
+    ctx.fillStyle = '#8A8070'; ctx.font = 'bold 22px "Times New Roman", Times, serif';
+    ctx.fillText('#', cols.rank, tableTop + 44); ctx.fillText('MEMBER', cols.name, tableTop + 44);
+    ctx.fillText('W', cols.wins, tableTop + 44); ctx.fillText('D', cols.draws, tableTop + 44);
     ctx.fillText('L', cols.losses, tableTop + 44);
-    // Right-align PTS header
-    ctx.textAlign = 'right';
-    ctx.fillText('PTS', W - 70, tableTop + 44);
-    ctx.textAlign = 'left';
-
-    // Rows
+    ctx.textAlign = 'right'; ctx.fillText('PTS', W - 70, tableTop + 44); ctx.textAlign = 'left';
     const sorted = [...overallData].sort((a, b) => {
       const pa = Math.max(0, a.wins * 10 + (a.draws||0) * 5 - a.losses * 5);
       const pb = Math.max(0, b.wins * 10 + (b.draws||0) * 5 - b.losses * 5);
       return pb - pa;
     });
-
     sorted.forEach((entry, i) => {
       const draws = entry.draws || 0;
       const points = Math.max(0, entry.wins * 10 + draws * 5 - entry.losses * 5);
       const y = tableTop + rowH + i * rowH;
-
-      ctx.fillStyle = i % 2 === 0 ? '#141824' : '#10141F';
-      ctx.fillRect(60, y, tableW, rowH);
-
+      ctx.fillStyle = i % 2 === 0 ? '#141824' : '#10141F'; ctx.fillRect(60, y, tableW, rowH);
       if (i === 0) { ctx.fillStyle = '#FFD000'; ctx.fillRect(60, y, 4, rowH); }
       else if (i === 1) { ctx.fillStyle = '#C0C0C0'; ctx.fillRect(60, y, 4, rowH); }
       else if (i === 2) { ctx.fillStyle = '#CD7F32'; ctx.fillRect(60, y, 4, rowH); }
-
       ctx.font = i === 0 ? 'bold 32px "Times New Roman", Times, serif' : '28px "Times New Roman", Times, serif';
-      ctx.fillStyle = i === 0 ? '#FFD000' : 'rgba(255,107,0,0.4)';
-      ctx.fillText(i + 1, cols.rank, y + 44);
-
-      ctx.fillStyle = '#E8E0D0';
+      ctx.fillStyle = i === 0 ? '#FFD000' : 'rgba(255,107,0,0.4)'; ctx.fillText(i + 1, cols.rank, y + 44);
+      ctx.fillStyle = '#E8E0D0'; ctx.font = 'bold 28px "Times New Roman", Times, serif'; ctx.fillText(entry.name, cols.name, y + 44);
       ctx.font = 'bold 28px "Times New Roman", Times, serif';
-      ctx.fillText(entry.name, cols.name, y + 44);
-
-      ctx.font = 'bold 28px "Times New Roman", Times, serif';
-      ctx.fillStyle = '#FFD000';
-      ctx.fillText(entry.wins, cols.wins, y + 44);
-
-      ctx.fillStyle = '#FF9A00';
-      ctx.fillText(draws, cols.draws, y + 44);
-
-      ctx.fillStyle = '#666';
-      ctx.fillText(entry.losses, cols.losses, y + 44);
-
-      ctx.textAlign = 'right';
-      ctx.fillStyle = points > 0 ? '#FFD000' : '#8A8070';
-      ctx.font = 'bold 28px "Times New Roman", Times, serif';
-      ctx.fillText(points, W - 70, y + 44);
-      ctx.textAlign = 'left';
-
-      ctx.fillStyle = 'rgba(255,255,255,0.04)';
-      ctx.fillRect(60, y + rowH - 1, tableW, 1);
+      ctx.fillStyle = '#FFD000'; ctx.fillText(entry.wins, cols.wins, y + 44);
+      ctx.fillStyle = '#FF9A00'; ctx.fillText(draws, cols.draws, y + 44);
+      ctx.fillStyle = '#666'; ctx.fillText(entry.losses, cols.losses, y + 44);
+      ctx.textAlign = 'right'; ctx.fillStyle = points > 0 ? '#FFD000' : '#8A8070';
+      ctx.font = 'bold 28px "Times New Roman", Times, serif'; ctx.fillText(points, W - 70, y + 44); ctx.textAlign = 'left';
+      ctx.fillStyle = 'rgba(255,255,255,0.04)'; ctx.fillRect(60, y + rowH - 1, tableW, 1);
     });
-
-    // Bottom bar
-    ctx.fillStyle = '#FF6B00';
-    ctx.fillRect(0, H - 18, W, 18);
-
-    ctx.fillStyle = '#8A8070';
-    ctx.font = '22px "Times New Roman", Times, serif';
+    ctx.fillStyle = '#FF6B00'; ctx.fillRect(0, H - 18, W, 18);
+    ctx.fillStyle = '#8A8070'; ctx.font = '22px "Times New Roman", Times, serif';
     ctx.fillText('reborn-ruby.vercel.app', 80, H - 40);
     ctx.fillText('🔥 Where Words Combust', W - 380, H - 40);
-
     const link = document.createElement('a');
-    link.download = 'reborn-standings.png';
-    link.href = canvas.toDataURL('image/png');
-    link.click();
+    link.download = 'reborn-standings.png'; link.href = canvas.toDataURL('image/png'); link.click();
   }
 
-  // ---- REGISTRY (Supabase) ----
-  const SB_URL = 'https://jmatpwiipqwwgvusirtt.supabase.co';
-  const SB_KEY = 'sb_publishable_-6uh2nFv9DwIRss_yce7PA_MbSHCR7n';
-
+  // ===== REGISTRY =====
   let regAdminMode = false;
   let regState = { open: false, topic: '' };
 
-  async function sbFetch(path, options = {}) {
-    const res = await fetch(SB_URL + path, {
-      ...options,
-      headers: {
-        'apikey': SB_KEY,
-        'Authorization': 'Bearer ' + SB_KEY,
-        'Content-Type': 'application/json',
-        'Prefer': options.prefer || '',
-        ...(options.headers || {})
-      }
-    });
-    if (!res.ok && res.status !== 204) {
-      const err = await res.text();
-      console.error('Supabase error:', err);
-      return null;
-    }
-    if (res.status === 204) return null;
-    return res.json();
-  }
-
   async function loadRegState() {
-    const data = await sbFetch('/rest/v1/registry_state?id=eq.1&select=open,topic');
-    if (data && data.length > 0) {
-      regState = { open: data[0].open, topic: data[0].topic || '' };
+    try {
+      const data = await sbFetch('/rest/v1/registry_state?id=eq.1&select=open,topic');
+      if (data && data.length > 0) {
+        regState = { open: data[0].open, topic: data[0].topic || '' };
+      }
+    } catch (e) {
+      console.error('Failed to load registry state:', e);
     }
     applyRegState();
   }
@@ -2521,7 +2328,6 @@
     const form = document.getElementById('regForm');
     const banner = document.getElementById('regClosedBanner');
     const topicDisplay = document.getElementById('regTopicDisplay');
-
     if (regState.open) {
       dot.className = 'reg-status-dot open';
       txt.className = 'reg-status-text open';
@@ -2536,7 +2342,6 @@
       form.classList.remove('show');
       banner.classList.add('show');
     }
-
     if (regAdminMode) loadAndRenderRegistrants();
   }
 
@@ -2613,53 +2418,58 @@
     const phone = document.getElementById('regPhone').value.trim();
     const success = document.getElementById('regSuccess');
     if (!name || !phone) { alert('Please fill in both fields.'); return; }
-
-    // Check duplicate
-    const existing = await sbFetch('/rest/v1/registrants?phone=eq.' + encodeURIComponent(phone) + '&select=id');
-    if (existing && existing.length > 0) { alert('This number is already registered for this week.'); return; }
-
-    await sbFetch('/rest/v1/registrants', {
-      method: 'POST',
-      prefer: 'return=minimal',
-      body: JSON.stringify({ name, phone })
-    });
-
-    document.getElementById('regName').value = '';
-    document.getElementById('regPhone').value = '';
-    success.classList.add('show');
-    setTimeout(() => success.classList.remove('show'), 4000);
+    try {
+      const existing = await sbFetch('/rest/v1/registrants?phone=eq.' + encodeURIComponent(phone) + '&select=id');
+      if (existing && existing.length > 0) { alert('This number is already registered for this week.'); return; }
+      await sbFetch('/rest/v1/registrants', {
+        method: 'POST',
+        prefer: 'return=minimal',
+        body: JSON.stringify({ name, phone })
+      });
+      document.getElementById('regName').value = '';
+      document.getElementById('regPhone').value = '';
+      success.classList.add('show');
+      setTimeout(() => success.classList.remove('show'), 4000);
+    } catch (e) {
+      console.error('Registration failed:', e);
+      alert('Registration failed. Please try again.');
+    }
   }
 
   async function loadAndRenderRegistrants() {
     const list = document.getElementById('regList');
     const badge = document.getElementById('regCountBadge');
     list.innerHTML = '<div style="padding:1rem;color:var(--muted);font-size:0.85rem;">Loading...</div>';
-
-    const items = await sbFetch('/rest/v1/registrants?select=name,phone&order=id.asc');
-    badge.textContent = items ? items.length : 0;
-    list.innerHTML = '';
-
-    if (!items || items.length === 0) {
-      list.innerHTML = '<div style="padding:1rem;color:var(--muted);font-style:italic;font-size:0.85rem;">No registrations yet.</div>';
-      return;
+    try {
+      const items = await sbFetch('/rest/v1/registrants?select=name,phone&order=id.asc');
+      badge.textContent = items ? items.length : 0;
+      list.innerHTML = '';
+      if (!items || items.length === 0) {
+        list.innerHTML = '<div style="padding:1rem;color:var(--muted);font-style:italic;font-size:0.85rem;">No registrations yet.</div>';
+        return;
+      }
+      items.forEach((r, i) => {
+        const el = document.createElement('div');
+        el.className = 'reg-entry';
+        el.innerHTML = `
+          <div style="display:flex;align-items:center;">
+            <span class="reg-entry-idx">${i + 1}</span>
+            <span class="reg-entry-name">${r.name}</span>
+          </div>
+          <span class="reg-entry-num">${r.phone}</span>
+        `;
+        list.appendChild(el);
+      });
+    } catch (e) {
+      list.innerHTML = '<div style="padding:1rem;color:#ff4444;font-size:0.85rem;">Failed to load.</div>';
     }
-
-    items.forEach((r, i) => {
-      const el = document.createElement('div');
-      el.className = 'reg-entry';
-      el.innerHTML = `
-        <div style="display:flex;align-items:center;">
-          <span class="reg-entry-idx">${i + 1}</span>
-          <span class="reg-entry-name">${r.name}</span>
-        </div>
-        <span class="reg-entry-num">${r.phone}</span>
-      `;
-      list.appendChild(el);
-    });
   }
 
   // Boot
-  loadRegState();
+  document.addEventListener('DOMContentLoaded', () => {
+    loadAllBoards();
+    loadRegState();
+  });
 </script>
 </body>
 </html>
